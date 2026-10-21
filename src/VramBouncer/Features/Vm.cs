@@ -27,6 +27,20 @@ public sealed class GameRow(Game g, bool excluded, bool byDefault)
     public bool IsExcluded => excluded;
     public string Reason => byDefault ? Loc.T("Games.ByDefault") : Loc.T("Games.ByYou");
 
+    /// <summary>VRAM budget in GB as typed; empty = evict everything (v1.0).</summary>
+    public string Budget
+    {
+        get => Settings.Current.Games.Budgets.TryGetValue(g.Root, out var gb) ? gb.ToString("0.#") : "";
+        set
+        {
+            var b = Settings.Current.Games.Budgets;
+            if (double.TryParse(value.Replace(',', '.'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var gb) && gb > 0)
+                b[g.Root] = Math.Min(gb, 1024);
+            else b.Remove(g.Root);
+            Settings.Save();
+        }
+    }
+
     public bool Evict
     {
         get => !Settings.Current.Games.Off.Contains(g.Root, StringComparer.OrdinalIgnoreCase);
@@ -46,7 +60,7 @@ public sealed record SessionRow(Session S)
     public string When => S.Start.ToLocalTime().ToString("g");
     public string Game => S.Game;
     public string Duration => S.End is { } e ? Minutes(e - S.Start) : "—";
-    static string Minutes(TimeSpan t) => t.TotalHours >= 1 ? string.Format(Loc.T("Unit.HourMin"), (int)t.TotalHours, t.Minutes) : string.Format(Loc.T("Unit.Min"), Math.Max(1, (int)t.TotalMinutes));
+    public static string Minutes(TimeSpan t) => t.TotalHours >= 1 ? string.Format(Loc.T("Unit.HourMin"), (int)t.TotalHours, t.Minutes) : string.Format(Loc.T("Unit.Min"), Math.Max(1, (int)t.TotalMinutes));
     public string Models => S.Evicted.Count == 0 ? Loc.T("Journal.Nothing")
         : $"{string.Join(", ", S.Evicted.Select(m => m.Name))} · {Engine.Gb(S.Evicted.Sum(m => m.Bytes))} {Loc.T("Unit.GB")}";
     public string Guard => S.Guard.Count == 0 ? "" : string.Join("\n", S.Guard);
@@ -164,7 +178,7 @@ public sealed class Vm : INotifyPropertyChanged
     }
 
     static ModelRow Row(Snap s, string status, Status kind) => new(
-        s.Backend == "command" ? Loc.T("Models.Commands") : s.Backend switch { "ollama" => "Ollama", "comfyui" => "ComfyUI", _ => s.Backend },
+        s.Backend == "command" ? Loc.T("Models.Commands") : s.Backend switch { "ollama" => "Ollama", "comfyui" => "ComfyUI", "lmstudio" => "LM Studio", _ => s.Backend },
         s.Label, s.VramBytes > 0 ? $"{Engine.Gb(s.VramBytes)} {Loc.T("Unit.GB")}" : "—", status, kind);
 
     /// <summary>Models by backend, the game, everything else, free (NVML total; PDH for our pids).</summary>
@@ -173,7 +187,7 @@ public sealed class Vm : INotifyPropertyChanged
         if (v.Gpu is not { } g) return [];
         var segs = new List<Seg>();
         var models = 0L;
-        foreach (var (kind, label, fill) in new[] { ("llama-server", "llama-server", Blue), ("ollama", "Ollama", Purple), ("comfyui", "ComfyUI", Teal) })
+        foreach (var (kind, label, fill) in new[] { ("llama-server", "llama-server", Blue), ("lmstudio", "LM Studio", Pink), ("ollama", "Ollama", Purple), ("comfyui", "ComfyUI", Teal) })
         {
             var bytes = v.Probes.GetValueOrDefault(kind)?.Loaded.Sum(s => s.VramBytes) ?? 0;
             if (bytes <= 0) continue;
@@ -213,6 +227,21 @@ public sealed class Vm : INotifyPropertyChanged
     }
 
     public bool NoSessions => Sessions.Count == 0;
+
+    /// <summary>Journal header (v1.0): the last 7 days at a glance.</summary>
+    public string Summary
+    {
+        get
+        {
+            var week = Sessions.Select(r => r.S).Where(s => s.Start > DateTime.UtcNow.AddDays(-7)).ToList();
+            if (week.Count == 0) return Loc.T("Journal.SummaryEmpty");
+            var back = week.Where(s => s.RestoreSec is not null).Select(s => s.RestoreSec!.Value).DefaultIfEmpty(0).Average();
+            return string.Format(Loc.T("Journal.Summary"), week.Count, Engine.Gb(week.Sum(s => s.Evicted.Sum(m => m.Bytes))), Math.Round(back), week.Sum(s => s.Guard.Count));
+        }
+    }
+
+    public List<GameHint> Hints => View.Hints;
+    public bool HasHints => View.Hints.Count > 0;
 
     public static string Clock(TimeSpan t) => t.TotalHours >= 1 ? $"{(int)t.TotalHours}:{t.Minutes:00}:{t.Seconds:00}" : $"{t.Minutes:00}:{t.Seconds:00}";
 

@@ -19,6 +19,7 @@ public sealed class Engine
     readonly SemaphoreSlim wake = new(0);
     readonly CancellationTokenSource stop = new();
     readonly GameWatcher watcher = new();
+    readonly HintWatch hints = new();
 
     BState state = new();
     List<Snap> evicted = [];
@@ -72,6 +73,8 @@ public sealed class Engine
         if (then is not null) _ = Application.Current.Dispatcher.BeginInvoke(then);
     });
     public void RefreshCatalog() => Post(ct => { catalogAt = default; probedAt = default; return Step(ct); });
+    /// <summary>The hint was answered (added as a game or "Not a game").</summary>
+    public void Forget(string exe) => Post(ct => { hints.Forget(exe); catalogAt = default; return Step(ct); });
     public bool HasEvicted => evicted.Count > 0;
 
     /// <summary>"Check eviction": what would be done now, nothing is run.</summary>
@@ -142,6 +145,13 @@ public sealed class Engine
         if (DateTime.UtcNow - catalogAt > TimeSpan.FromMinutes(30)) Catalog();
         running = watcher.Poll(matcher);
         Announce();
+        if (state.Phase == Phase.Idle && running.Count == 0 && !manual && VramMonitor.Read() is { } gpu
+            && hints.Step(matcher, gpu.Total, DateTime.UtcNow) is { } hint)
+        {
+            Log.Info("a program with a lot of VRAM in the foreground: hint shown");
+            Notify(true, string.Format(Loc.T("Hint.Notify"), hint.Name, Gb(hint.VramBytes)), "games");
+            PublishNow();
+        }
         await Apply(Input(Cmd.None), ct);
         await Publish(ct);
     }
@@ -184,17 +194,22 @@ public sealed class Engine
     {
         PublishNow(); // "Evicting…" on screen while it runs
         var skipped = new List<Snap>();
-        evicted = [];
-        failed = [];
+        var plan = new List<(Backend B, Snap S)>();
         foreach (var b in Backends()) // llama-server first: the biggest one goes within the first seconds
             foreach (var s in (await SafeProbe(b, ct, checks: true)).Loaded)
+                if (s.Skip is null) plan.Add((b, s));
+                else skipped.Add(s);
+        var budget = BudgetBytes(); // v1.0: only what the game's budget needs, the biggest first
+        var chosen = Budget.Choose(plan.Select(x => x.S).ToList(), VramMonitor.Read()?.Free, budget).ToHashSet();
+        evicted = [];
+        failed = [];
+        foreach (var (b, s) in plan.Where(x => chosen.Contains(x.S)))
             {
-                if (s.Skip is not null) { skipped.Add(s); continue; }
                 evicted.Add(s);
                 Save(); // the snapshot is on disk before this unload
                 try
                 {
-                    var used = s.Backend == "command" ? VramMonitor.Read()?.Used : null;
+                    var used = s.VramBytes <= 0 ? VramMonitor.Read()?.Used : null; // unknown size (my commands, router): measure it
                     var r = await b.EvictAsync(s, ct);
                     if (used is { } u)
                     {
@@ -213,7 +228,8 @@ public sealed class Engine
                 Save();
             }
         var done = evicted;
-        guard = new Guard { Evicted = evicted };
+        var keys = done.Select(d => (d.Backend, d.Label)).ToHashSet();
+        guard = new Guard { Evicted = evicted, MayEvict = budget > 0 ? s => keys.Contains((s.Backend, s.Label)) : _ => true };
         foreach (var s in skipped) if (s.Pid is { } pid) guard.Reported.Add(pid);
         session = new Session { Game = state.Game ?? "?", Start = DateTime.UtcNow, Evicted = Models(done), Result = "pending" };
         Log.Info($"evicted {done.Count} item(s), {Gb(done.Sum(d => d.VramBytes))} GB");
@@ -253,12 +269,13 @@ public sealed class Engine
             session.Note = string.Join("; ", errors.Concat(warnings)) is { Length: > 0 } n ? n : null;
             Store.Append(session);
             var guardCount = session.Guard.Count;
-            session = null;
-            var text = string.Format(Loc.T("Notify.Restored"), secs) + (guardCount > 0 ? " · " + string.Format(Loc.T("Notify.GuardCount"), guardCount) : "");
+            var text = string.Format(Loc.T("Notify.Summary"), session.Game, SessionRow.Minutes(session.End.Value - session.Start),
+                Gb(session.Evicted.Sum(m => m.Bytes)), secs) + (guardCount > 0 ? " · " + string.Format(Loc.T("Notify.GuardCount"), guardCount) : "");
             Event(text);
             if (errors.Count > 0) Notify(Settings.Current.Notify.Errors, string.Join("\n", errors), "journal");
             else if (warnings.Count > 0) Notify(Settings.Current.Notify.Errors, string.Join("\n", warnings), "journal");
             else Notify(Settings.Current.Notify.Restore || guardCount > 0 && Settings.Current.Notify.Summary, text, "journal");
+            session = null;
         }
         Log.Info($"restore done in {secs} s, {errors.Count} error(s), {warnings.Count} warning(s)");
     }
@@ -288,7 +305,7 @@ public sealed class Engine
     List<Backend> Backends()
     {
         var c = Settings.Current.Backends;
-        var list = new List<Backend> { new LlamaBackend(c.Llama), new OllamaBackend(c.Ollama), new ComfyBackend(c.Comfy) };
+        var list = new List<Backend> { new LlamaBackend(c.Llama), new LmStudioBackend(c.LmStudio), new OllamaBackend(c.Ollama), new ComfyBackend(c.Comfy) };
         list.AddRange(c.Commands.Select(u => new CommandBackend(u)));
         return list.Where(b => b.On).ToList();
     }
@@ -301,6 +318,7 @@ public sealed class Engine
             "ollama" => new OllamaBackend(c.Ollama),
             "llama-server" => new LlamaBackend(c.Llama),
             "comfyui" => new ComfyBackend(c.Comfy),
+            "lmstudio" => new LmStudioBackend(c.LmStudio),
             "command" => c.Commands.FirstOrDefault(u => u.Name == s.Model) is { } u ? new CommandBackend(u) : null,
             _ => null,
         };
@@ -308,8 +326,12 @@ public sealed class Engine
 
     static string Title(Snap s) => s.Backend == "command" ? Loc.T("Models.Commands") : s.Backend switch
     {
-        "ollama" => "Ollama", "llama-server" => "llama-server", "comfyui" => "ComfyUI", _ => s.Backend,
+        "ollama" => "Ollama", "llama-server" => "llama-server", "comfyui" => "ComfyUI", "lmstudio" => "LM Studio", _ => s.Backend,
     };
+
+    /// <summary>The running game's VRAM budget in bytes; 0 = evict everything.</summary>
+    long BudgetBytes() =>
+        running.Count > 0 && Settings.Current.Games.Budgets.TryGetValue(running[0].Game.Root, out var gb) && gb > 0 ? (long)(gb * GB) : 0;
 
     static async Task<Probe> SafeProbe(Backend b, CancellationToken ct, bool checks)
     {
@@ -375,7 +397,7 @@ public sealed class Engine
         {
             var p = new Dictionary<string, Probe>();
             var c = Settings.Current.Backends;
-            foreach (var b in new Backend[] { new LlamaBackend(c.Llama), new OllamaBackend(c.Ollama), new ComfyBackend(c.Comfy) })
+            foreach (var b in new Backend[] { new LlamaBackend(c.Llama), new LmStudioBackend(c.LmStudio), new OllamaBackend(c.Ollama), new ComfyBackend(c.Comfy) })
                 p[b.Kind] = b.On ? await SafeProbe(b, ct, checks: false) : Probe.None();
             probes = p;
             probedAt = DateTime.UtcNow;
@@ -393,7 +415,7 @@ public sealed class Engine
         {
             Phase = state.Phase, Game = state.Game ?? GameName(), Since = state.Since, GoneSince = state.GoneSince, PausedUntil = state.PausedUntil,
             Grace = Timings().Grace, Manual = manual, Gpu = gpu, GameBytes = gameBytes, Evicted = [.. evicted], Failed = [.. failed],
-            Probes = probes, LastEvent = lastEvent, Catalog = catalog,
+            Probes = probes, LastEvent = lastEvent, Catalog = catalog, Hints = [.. hints.Hints],
         };
         Application.Current?.Dispatcher.BeginInvoke(() => Vm.I.Apply(view));
     }
@@ -416,4 +438,5 @@ public sealed record View
     public Dictionary<string, Probe> Probes { get; init; } = [];
     public string? LastEvent { get; init; }
     public GameCatalog.Result Catalog { get; init; } = new([], []);
+    public List<GameHint> Hints { get; init; } = [];
 }

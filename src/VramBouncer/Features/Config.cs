@@ -23,6 +23,8 @@ namespace VramBouncer.Features
         public List<string> Included { get; set; } = [];   // default exclusions the user turned back into games
         public List<string> Off { get; set; } = [];        // roots with "Evict models" off
         public List<string> Known { get; set; } = [];      // roots already announced as "Recognized as a game"
+        public Dictionary<string, double> Budgets { get; set; } = []; // root → GB the game needs (v1.0); none = evict all
+        public List<string> NotGames { get; set; } = [];   // exe paths answered "Not a game" to the "Is this a game?" hint
     }
 
     public sealed class ManualGame
@@ -42,6 +44,7 @@ namespace VramBouncer.Features
         public OllamaConfig Ollama { get; set; } = new();
         public LlamaConfig Llama { get; set; } = new();
         public ComfyConfig Comfy { get; set; } = new();
+        public LmStudioConfig LmStudio { get; set; } = new();
         public List<UserCommand> Commands { get; set; } = [];
     }
 

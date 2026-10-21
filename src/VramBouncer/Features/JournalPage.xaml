@@ -15,7 +15,8 @@
                 <ui:TextBlock FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{l:T Page.Journal}" />
                 <ui:Button x:Name="OpenLogs" Grid.Column="1" Icon="{ui:SymbolIcon FolderOpen24}" Content="{l:T Journal.OpenLogs}" VerticalAlignment="Center" />
             </Grid>
-            <ui:TextBlock Appearance="Secondary" Text="{l:T Journal.Subtitle}" Margin="0,4,0,12" TextWrapping="Wrap" />
+            <ui:TextBlock Appearance="Secondary" Text="{l:T Journal.Subtitle}" Margin="0,4,0,8" TextWrapping="Wrap" />
+            <ui:TextBlock FontTypography="BodyStrong" Text="{Binding Summary}" Margin="0,0,0,12" TextWrapping="Wrap" />
             <ui:TextBlock Appearance="Tertiary" Text="{l:T Journal.Empty}" Visibility="{Binding NoSessions, Converter={StaticResource Vis}}" />
             <ItemsControl ItemsSource="{Binding Sessions}">
                 <ItemsControl.ItemTemplate>

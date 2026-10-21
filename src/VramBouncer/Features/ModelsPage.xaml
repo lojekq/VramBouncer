@@ -63,6 +63,34 @@
                 </StackPanel>
             </Border>
 
+            <!-- LM Studio (v1.0) -->
+            <Border Style="{StaticResource Card}" DataContext="{x:Static f:ModelsPage.LmStudio}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <ui:TextBlock Text="LM Studio" FontTypography="BodyStrong" />
+                            <ui:TextBlock x:Name="LmStatus" Appearance="Secondary" FontTypography="Caption" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding On}" />
+                    </Grid>
+                    <WrapPanel Margin="0,10,0,0">
+                        <ui:TextBlock Text="{l:T Models.Address}" Style="{StaticResource Label}" />
+                        <ui:TextBox Text="{Binding Url, UpdateSourceTrigger=LostFocus}" Width="230" Margin="0,0,20,0" />
+                        <ui:TextBlock Text="{l:T Models.RestorePolicy}" Style="{StaticResource Label}" />
+                        <ComboBox SelectedValue="{Binding Restore}" SelectedValuePath="Tag" MinWidth="170">
+                            <ComboBoxItem Tag="always" Content="{l:T Policy.Always}" />
+                            <ComboBoxItem Tag="never" Content="{l:T Policy.Never}" />
+                        </ComboBox>
+                    </WrapPanel>
+                    <ui:TextBlock Text="{l:T Models.Token}" Style="{StaticResource Label}" Margin="0,10,0,4" />
+                    <StackPanel Orientation="Horizontal">
+                        <ui:PasswordBox x:Name="LmToken" Width="320" Margin="0,0,12,0" />
+                        <ui:TextBlock x:Name="LmTokenNote" Appearance="Secondary" VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <!-- Ollama -->
             <Border Style="{StaticResource Card}" DataContext="{x:Static f:ModelsPage.Ollama}">
                 <StackPanel>

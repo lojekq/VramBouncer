@@ -89,6 +89,8 @@ public sealed class GameMatcher(IReadOnlyList<Game> games, IReadOnlyList<string>
 
     public IReadOnlyList<Game> Games => games;
 
+    public bool Excluded(string exePath) => excludedRoots.Any(r => Paths.IsUnder(r, exePath));
+
     public Game? Match(string? exePath, string processName)
     {
         var file = exePath is null ? processName : Path.GetFileName(exePath);

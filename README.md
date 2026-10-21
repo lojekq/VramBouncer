@@ -26,17 +26,18 @@ VRAM Bouncer notices the game, unloads the models with each server's own API, an
 
 ## Features
 
-- **Finds your games** — Steam and Epic libraries are read by themselves; anything else is one click (an exe or a folder).
-- **Unloads the right way** — Ollama, llama-server and ComfyUI through their own API; for everything else (MLink, llama-swap, WSL, Docker) there are your own commands.
+- **Finds your games** — Steam and Epic libraries are read by themselves; anything else is one click. A program that holds over 1.5 GB of VRAM in the foreground gets an "Is this a game?" prompt.
+- **Unloads the right way** — Ollama, LM Studio, llama-server (single and router mode) and ComfyUI through their own API; for everything else (MLink, llama-swap, WSL, Docker) there are your own commands.
+- **VRAM budget per game** — tell it Dota 2 needs 6 GB, and only the models that don't fit are evicted, the biggest first; a small one may stay.
 - **Brings back the same model** — the same context size and keep-alive, only after the game is closed and the VRAM is really free.
-- **Guard** — if something loads a model in the middle of a match, it is evicted again, and the journal shows what and when.
+- **Guard and journal** — a model loaded in the middle of a match is evicted again; the journal shows what, when, how many GB and how long the return took.
 - **Survives crashes, sleep and reboots** — what was evicted is written to disk before anything is unloaded.
 - **No admin rights, no telemetry, nothing injected into games** — safe for anti-cheats.
 
 ## How it works
 
 Every 2 seconds it compares running processes with the folders of your game libraries (`steamapps\common\…`, Epic install folders, your own entries).
-When a game starts, it writes a snapshot of the loaded models to `%APPDATA%\VramBouncer\state.json` and unloads them: `keep_alive: 0` for Ollama, `POST /free` for ComfyUI, your command for the rest.
+When a game starts, it writes a snapshot of the loaded models to `%APPDATA%\VramBouncer\state.json` and unloads them (or, with a budget, only as many as the game needs): `keep_alive: 0` for Ollama, `/api/v1/models/unload` for LM Studio, `/models/unload` for a llama-server router, `POST /free` for ComfyUI, your command for the rest.
 A single-mode llama-server has no unload call, so it is stopped and later started again with the captured command line, without a console window.
 During the game a guard checks every 15 s whether a model came back. After the game: a 60 s grace period, then a wait until NVML reports enough free VRAM (up to 10 min), then the models return one by one.
 
@@ -77,8 +78,10 @@ If another program restarts your llama-server (a watchdog, a launcher like MLink
 | Setting | Default | What it does |
 |---|---|---|
 | Games → Evict models | on for every game | Per game: whether starting it turns game mode on |
+| Games → GB | empty | VRAM budget of the game: only the models that don't fit are evicted, the biggest first. Empty: evict all |
 | Models → llama-server port | 8080 | Which llama-server is stopped and started again |
 | Models → Ollama address | `OLLAMA_HOST` or `127.0.0.1:11434` | Loopback addresses only |
+| Models → LM Studio | `127.0.0.1:1234`, no token | LM Studio 0.4+ REST API; the token is needed only when LM Studio requires authentication and is stored encrypted for your Windows user (DPAPI). With the server off, `lms unload --all` still frees the VRAM |
 | Models → Bring back | Ollama: only long-lived, llama-server: always | Ollama models with ≤ 30 min left are not loaded again: Ollama loads them on the next request |
 | My commands | none | Evict, Restore and an optional Check (exit code 0 = loaded) per entry; run with no window |
 | Grace period | 60 s | No game process for this long → models come back |
@@ -132,7 +135,7 @@ About → **Remove data and autostart**, then delete the exe.
 
 No telemetry. Network requests:
 - `GET https://api.github.com/repos/lojekq/VramBouncer/releases/latest` once a day, to tell you about a new version; turn it off in Settings;
-- HTTP to the model servers you enabled, on loopback addresses only (`127.0.0.1`, `localhost`): Ollama, llama-server `/health`, ComfyUI.
+- HTTP to the model servers you enabled, on loopback addresses only (`127.0.0.1`, `localhost`): Ollama, LM Studio, llama-server (`/health`, router `/models`), ComfyUI.
 
 Logs contain no window titles, paths, command lines or model names. The captured llama-server command line is stored only in `state.json` while a game runs.
 

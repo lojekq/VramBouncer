@@ -26,6 +26,7 @@ public sealed record Snap
     public long VramBytes { get; init; }
     public bool Restore { get; init; }
     public DateTime? KilledAt { get; init; }       // llama-server, UTC: for the kill-loop check
+    public string? Instance { get; init; }         // LM Studio instance id; llama-server router: "router"
     [JsonIgnore] public string? Skip { get; init; } // loaded but not evicted, and why (shown in the UI)
 
     [JsonIgnore] public string Label => Model ?? Backend;
@@ -60,6 +61,8 @@ public sealed class Guard
     public required IReadOnlyList<Snap> Evicted { get; init; }
     public HashSet<int> Reported { get; } = [];
     public DateTime LastComfyFree { get; set; }
+    /// <summary>With a VRAM budget only what was evicted goes again (a small model may stay); without one, everything.</summary>
+    public Func<Snap, bool> MayEvict { get; init; } = _ => true;
     public List<string> Warnings { get; } = []; // also go to a notification
 }
 
@@ -68,11 +71,12 @@ public static class Http
     public static readonly HttpClient Client = new() { Timeout = Timeout.InfiniteTimeSpan };
     public static readonly TimeSpan Short = TimeSpan.FromSeconds(10), Load = TimeSpan.FromMinutes(5);
 
-    public static async Task<HttpResponseMessage> Send(HttpMethod m, string url, JsonNode? body, TimeSpan timeout, CancellationToken ct)
+    public static async Task<HttpResponseMessage> Send(HttpMethod m, string url, JsonNode? body, TimeSpan timeout, CancellationToken ct, string? bearer = null)
     {
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         cts.CancelAfter(timeout);
         using var req = new HttpRequestMessage(m, url);
+        if (bearer is not null) req.Headers.Authorization = new("Bearer", bearer);
         if (body is not null) req.Content = new StringContent(body.ToJsonString(), Encoding.UTF8, "application/json");
         var r = await Client.SendAsync(req, cts.Token);
         await r.Content.LoadIntoBufferAsync(cts.Token);
@@ -201,7 +205,7 @@ public sealed class OllamaBackend(OllamaConfig cfg) : Backend
         List<Snap> loaded;
         try { loaded = await Loaded(url, ct); }
         catch (Exception e) when (e is HttpRequestException or OperationCanceledException && !ct.IsCancellationRequested) { return events; }
-        foreach (var m in loaded)
+        foreach (var m in loaded.Where(g.MayEvict))
         {
             await EvictAsync(m, ct);
             events.Add(string.Format(Loc.T("Guard.Reloaded"), m.Model));
@@ -238,6 +242,15 @@ public static class LlamaArgs
                 if (value is { Length: > 0 } v && !Path.IsPathFullyQualified(v)) r.Add(v);
         }
         return r;
+    }
+
+    /// <summary>The first key of --api-key (a comma list) or the first line of --api-key-file. Never logged, never stored.</summary>
+    public static string? ApiKey(string[] args)
+    {
+        if (Value(args, "--api-key") is { Length: > 0 } k) return k.Split(',')[0];
+        if (Value(args, "--api-key-file") is not { Length: > 0 } f) return null;
+        try { return File.ReadLines(f).Select(l => l.Trim()).FirstOrDefault(l => l.Length > 0); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { return null; }
     }
 
     /// <summary>Adds --log-file unless it is already there, so a relaunched server writes into our logs folder.</summary>
@@ -309,6 +322,11 @@ public sealed class LlamaBackend(LlamaConfig cfg) : Backend
         var cmd = ProcessInfo.CommandLine(pid);
         var raw = cmd is null ? null : CmdLine.SplitExe(cmd).RawArgs;
         var args = raw is null ? [] : CmdLine.Args(raw);
+        if (await Router(port, ct) is { } models) // router mode (v1.0): unload and load by name, no kill
+            return new(true, "router", [.. Loaded(models).Select(id => new Snap
+            {
+                Backend = Kind, Model = id, Port = port, Pid = pid, Instance = "router", Restore = cfg.Restore != RestorePolicy.Never,
+            })], [], cmd);
         foreach (var rel in LlamaArgs.RelativePaths(args)) warnings.Add(string.Format(Loc.T("Llama.Relative"), rel));
         if (ProcessInfo.Tree().Parent(pid)?.Exe is { } parent && Watchdogs.Contains(parent, StringComparer.OrdinalIgnoreCase))
             warnings.Add(string.Format(Loc.T("Llama.Parent"), parent));
@@ -334,6 +352,12 @@ public sealed class LlamaBackend(LlamaConfig cfg) : Backend
     public override async Task<Snap> EvictAsync(Snap s, CancellationToken ct)
     {
         if (Forbidden(s.Port ?? 0)) throw new InvalidOperationException(Loc.T("Llama.DebugPort"));
+        if (s.Instance == "router")
+        {
+            await RouterCall(s.Port ?? cfg.Port, "unload", s.Model!, ct);
+            for (var i = 0; i < 30 && await Router(s.Port ?? cfg.Port, ct) is { } m && Loaded(m).Contains(s.Model!); i++) await Task.Delay(1000, ct);
+            return s;
+        }
         if (s.Pid is not { } pid || TcpPorts.ListenerPid(s.Port ?? 0) != pid) throw new InvalidOperationException(Loc.T("Llama.Gone"));
         using var p = Process.GetProcessById(pid);
         var killed = DateTime.UtcNow;
@@ -350,6 +374,19 @@ public sealed class LlamaBackend(LlamaConfig cfg) : Backend
     {
         var port = s.Port ?? cfg.Port;
         if (Forbidden(port)) throw new InvalidOperationException(Loc.T("Llama.DebugPort"));
+        if (s.Instance == "router")
+        {
+            await RouterCall(port, "load", s.Model!, ct);
+            var wait = Stopwatch.StartNew();
+            while (wait.Elapsed < Http.Load)
+            {
+                var item = (await Router(port, ct))?.FirstOrDefault(x => x?["id"]?.GetValue<string>() == s.Model);
+                if (item?["status"]?["value"]?.GetValue<string>() == "loaded") return null;
+                if (item?["status"]?["failed"]?.GetValue<bool>() == true) throw new InvalidOperationException(string.Format(Loc.T("Llama.RouterFailed"), s.Model));
+                await Task.Delay(1000, ct);
+            }
+            throw new TimeoutException(Loc.T("Llama.NoHealth"));
+        }
         Process? started = null;
         if (TcpPorts.ListenerPid(port) is null) // busy port: someone (MLink autostart, a watchdog) already brought it back
         {
@@ -374,11 +411,23 @@ public sealed class LlamaBackend(LlamaConfig cfg) : Backend
         throw new TimeoutException(Loc.T("Llama.NoHealth"));
     }
 
-    public override Task<List<string>> GuardAsync(Guard g, CancellationToken ct)
+    public override async Task<List<string>> GuardAsync(Guard g, CancellationToken ct)
     {
         var events = new List<string>();
         var port = cfg.Port;
-        if (Forbidden(port) || TcpPorts.ListenerPid(port) is not { } pid || !g.Reported.Add(pid)) return Task.FromResult(events);
+        if (Forbidden(port) || TcpPorts.ListenerPid(port) is not { } pid) return events;
+        if (await Router(port, ct) is { } models) // router: a client request loads a model again (autoload)
+        {
+            foreach (var id in Loaded(models))
+            {
+                var snap = new Snap { Backend = Kind, Model = id, Port = port, Instance = "router" };
+                if (!g.MayEvict(snap)) continue;
+                await EvictAsync(snap, ct);
+                events.Add(string.Format(Loc.T("Guard.Reloaded"), id));
+            }
+            return events;
+        }
+        if (!g.Reported.Add(pid)) return events;
         var killed = g.Evicted.FirstOrDefault(e => e.Backend == Kind && e.Port == port)?.KilledAt;
         if (killed is { } k && ProcessInfo.StartTime(pid) is { } started && KillLoop.IsWatchdog(k, started))
         {
@@ -396,11 +445,47 @@ public sealed class LlamaBackend(LlamaConfig cfg) : Backend
             events.Add(text);
             g.Warnings.Add(text);
         }
-        return Task.FromResult(events);
+        return events;
     }
 
-    public override async Task<bool?> IsLoadedAsync(Snap s, CancellationToken ct) =>
-        TcpPorts.ListenerPid(s.Port ?? cfg.Port) is not null && await Http.Healthy(s.Port ?? cfg.Port, ct);
+    public override async Task<bool?> IsLoadedAsync(Snap s, CancellationToken ct)
+    {
+        var port = s.Port ?? cfg.Port;
+        if (TcpPorts.ListenerPid(port) is null) return false;
+        if (s.Instance == "router") return await Router(port, ct) is { } m ? Loaded(m).Contains(s.Model!) : null;
+        return await Http.Healthy(port, ct);
+    }
+
+    // ───────── router mode ─────────
+
+    /// <summary>The key of the server listening on the port, read from its own command line at the moment of the call.</summary>
+    static string? Key(int port) =>
+        TcpPorts.ListenerPid(port) is { } pid && ProcessInfo.CommandLine(pid) is { } cmd ? LlamaArgs.ApiKey(CmdLine.Args(CmdLine.SplitExe(cmd).RawArgs)) : null;
+
+    /// <summary>GET /models in router mode (items carry "status"); null for a single-model server or an error.</summary>
+    static async Task<JsonArray?> Router(int port, CancellationToken ct)
+    {
+        try
+        {
+            using var r = await Http.Send(HttpMethod.Get, $"http://127.0.0.1:{port}/models", null, Http.Short, ct, Key(port));
+            if (!r.IsSuccessStatusCode) return null;
+            var data = JsonNode.Parse(await r.Content.ReadAsStringAsync(ct))?["data"]?.AsArray();
+            return data is { Count: > 0 } && data.All(m => m?["status"] is JsonObject) ? data : null;
+        }
+        catch (Exception e) when (e is HttpRequestException or OperationCanceledException or JsonException or InvalidOperationException && !ct.IsCancellationRequested) { return null; }
+    }
+
+    /// <summary>Models that hold VRAM: loaded or still loading.</summary>
+    internal static List<string> Loaded(JsonArray models) => models
+        .Where(m => m?["status"]?["value"]?.GetValue<string>() is "loaded" or "loading")
+        .Select(m => m?["id"]?.GetValue<string>()).OfType<string>().ToList();
+
+    static async Task RouterCall(int port, string verb, string model, CancellationToken ct)
+    {
+        using var r = await Http.Send(HttpMethod.Post, $"http://127.0.0.1:{port}/models/{verb}", new JsonObject { ["model"] = model },
+            verb == "load" ? Http.Load : Http.Short, ct, Key(port));
+        r.EnsureSuccessStatusCode();
+    }
 }
 
 // ───────────────────────── ComfyUI ─────────────────────────

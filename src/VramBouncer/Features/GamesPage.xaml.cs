@@ -47,6 +47,21 @@ public partial class GamesPage
         Engine.I?.RefreshCatalog();
     }
 
+    void HintAdd(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is not GameHint h) return;
+        Add(h.Name, h.Exe);
+        Engine.I?.Forget(h.Exe);
+    }
+
+    void HintNotGame(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is not GameHint h) return;
+        if (!Settings.Current.Games.NotGames.Contains(h.Exe, StringComparer.OrdinalIgnoreCase)) Settings.Current.Games.NotGames.Add(h.Exe);
+        Settings.Save();
+        Engine.I?.Forget(h.Exe);
+    }
+
     void IsAGame(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.Tag is not GameRow row) return;

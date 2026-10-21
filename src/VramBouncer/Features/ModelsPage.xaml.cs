@@ -21,6 +21,7 @@ public partial class ModelsPage
     public static LlamaConfig Llama => Settings.Current.Backends.Llama;
     public static OllamaConfig Ollama => Settings.Current.Backends.Ollama;
     public static ComfyConfig Comfy => Settings.Current.Backends.Comfy;
+    public static LmStudioConfig LmStudio => Settings.Current.Backends.LmStudio;
 
     /// <summary>The last "Check eviction" result: the demo fills it for the screenshot.</summary>
     public static List<string> LastPlan { get; set; } = [];
@@ -46,6 +47,15 @@ public partial class ModelsPage
             rows.Add(new(c));
         };
         HandsOffButton.Click += (_, _) => { Llama.HandsOff = false; Draw(); };
+        LmTokenNote.Text = LmStudio.Token is null ? "" : Loc.T("Models.TokenSaved");
+        LmToken.LostFocus += (_, _) =>
+        {
+            if (LmToken.Password is not { Length: > 0 } t) return;
+            LmStudio.Token = LmStudioConfig.Protect(t); // DPAPI, this Windows user only
+            LmToken.Password = "";
+            LmTokenNote.Text = Loc.T("Models.TokenSaved");
+            Save();
+        };
         PlanButton.Click += async (_, _) =>
         {
             if (Engine.I is not { } e) return;
@@ -71,6 +81,7 @@ public partial class ModelsPage
         LlamaStatus.Text = Status("llama-server", Llama.On, Llama.Port);
         OllamaStatus.Text = Status("ollama", Ollama.On, null);
         ComfyStatus.Text = Status("comfyui", Comfy.On, null);
+        LmStatus.Text = Status("lmstudio", LmStudio.On, null);
         var lp = p.GetValueOrDefault("llama-server");
         LlamaCaptured.Text = lp?.Detail ?? "";
         LlamaWarnings.ItemsSource = lp?.Warnings ?? (Llama.HandsOff ? [Loc.T("Llama.HandsOff")] : []);
@@ -87,6 +98,8 @@ public partial class ModelsPage
         parts.Add(p.Loaded.Count == 0 ? Loc.T("Models.NothingLoaded")
             : string.Join(", ", p.Loaded.Select(s => s.VramBytes > 0 ? $"{s.Label} ({Engine.Gb(s.VramBytes)} {Loc.T("Unit.GB")})" : s.Label)));
         if (kind == "llama-server" && p.Version == "loading") parts.Add(Loc.T("Models.Loading"));
+        if (kind == "llama-server" && p.Version == "router") parts.Insert(1, Loc.T("Models.Router"));
+        if (kind != "llama-server") parts.AddRange(p.Warnings); // llama-server has its own list below
         return string.Join(" · ", parts);
     }
 

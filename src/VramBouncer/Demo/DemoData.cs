@@ -32,11 +32,13 @@ public static class DemoData
         ["llama-server"] = llama ? new(true, "ok", [Llama], [], LlamaCmd) : Probe.None(),
         ["ollama"] = new(true, "0.40.6", qwen ? [Qwen, new() { Backend = "ollama", Model = "nomic-embed-text", VramBytes = G(0.3) }] : [], []),
         ["comfyui"] = new(true, "0.42.1", comfy ? [Comfy] : [Comfy with { VramBytes = 0 }], []),
+        ["lmstudio"] = Probe.None(),
     };
 
     public static View Idle() => new()
     {
         Phase = Phase.Idle, Gpu = Gpu(15.2), Probes = Loaded(), Catalog = Catalog(),
+        Hints = [new(@"C:\Users\demo\Games\RetroArch\retroarch.exe", G(2.1))],
         LastEvent = $"{DateTime.Now.AddMinutes(-37):HH:mm} " + string.Format(Loc.T("Notify.Restored"), 18),
     };
 
@@ -74,6 +76,8 @@ public static class DemoData
             Check = "curl.exe -sf http://127.0.0.1:8090/health",
         });
         s.Games.Off.Add(@"C:\Program Files\Epic Games\Fortnite");
+        s.Games.Budgets[@"D:\SteamLibrary\steamapps\common\dota 2 beta"] = 6;
+        s.Games.Budgets[@"D:\SteamLibrary\steamapps\common\Counter-Strike Global Offensive"] = 8;
         var game = Args.Current.Page is null or "overview" && Args.Current.Theme != "light" && !Args.Current.Autoplay;
         Vm.I.Apply(game ? InGame(DateTime.UtcNow.AddSeconds(-42)) : Idle());
         ModelsPage.LastPlan =

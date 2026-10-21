@@ -5,6 +5,9 @@
       xmlns:l="clr-namespace:VramBouncer.Shell"
       xmlns:f="clr-namespace:VramBouncer.Features"
       Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="Vis" />
+    </Page.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24,12,24,24" MaxWidth="900">
             <ui:TextBlock FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{l:T Page.Games}" />
@@ -35,17 +38,46 @@
                                     <ColumnDefinition Width="3*" />
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <ui:TextBlock Text="{Binding Name}" FontTypography="BodyStrong" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip="{Binding Name}" />
                                 <ui:TextBlock Grid.Column="1" Text="{Binding Source}" Appearance="Secondary" VerticalAlignment="Center" />
                                 <ui:TextBlock Grid.Column="2" Text="{Binding Root}" Appearance="Tertiary" FontTypography="Caption" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip="{Binding Root}" />
-                                <ui:ToggleSwitch Grid.Column="3" IsChecked="{Binding Evict}" OnContent="{l:T Games.Evict}" OffContent="{l:T Games.Evict}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                                <ui:Button Grid.Column="4" Content="{l:T Games.NotAGame}" Appearance="Transparent" Click="NotAGame" Tag="{Binding}" Padding="8,4" />
+                                <ui:TextBox Grid.Column="3" Text="{Binding Budget, UpdateSourceTrigger=LostFocus}" Width="76" Margin="0,0,10,0" VerticalAlignment="Center"
+                                            PlaceholderText="{l:T Games.Budget}" ToolTip="{l:T Games.Budget.Tip}" />
+                                <ui:ToggleSwitch Grid.Column="4" IsChecked="{Binding Evict}" OnContent="{l:T Games.Evict}" OffContent="{l:T Games.Evict}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                <ui:Button Grid.Column="5" Content="{l:T Games.NotAGame}" Appearance="Transparent" Click="NotAGame" Tag="{Binding}" Padding="8,4" />
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
+            <StackPanel Visibility="{Binding HasHints, Converter={StaticResource Vis}}">
+                <ui:TextBlock FontTypography="Subtitle" Text="{l:T Hint.Title}" Margin="0,20,0,4" />
+                <ui:TextBlock Appearance="Secondary" Text="{l:T Hint.Note}" Margin="0,0,0,8" TextWrapping="Wrap" />
+                <ItemsControl ItemsSource="{Binding Hints}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type f:GameHint}">
+                            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" BorderBrush="#F0883E"
+                                    BorderThickness="1" CornerRadius="4" Padding="14,8" Margin="0,0,0,4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBlock Text="{Binding Name}" FontTypography="BodyStrong" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                    <ui:TextBlock Grid.Column="1" Text="{Binding Exe}" Appearance="Tertiary" FontTypography="Caption" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip="{Binding Exe}" />
+                                    <ui:Button Grid.Column="2" Content="{l:T Games.IsAGame}" Appearance="Primary" Click="HintAdd" Tag="{Binding}" Padding="8,4" Margin="0,0,8,0" />
+                                    <ui:Button Grid.Column="3" Content="{l:T Games.NotAGame}" Appearance="Transparent" Click="HintNotGame" Tag="{Binding}" Padding="8,4" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
 
             <ui:TextBlock FontTypography="Subtitle" Text="{l:T Games.Excluded}" Margin="0,20,0,4" />
             <ui:TextBlock Appearance="Secondary" Text="{l:T Games.Excluded.Note}" Margin="0,0,0,8" TextWrapping="Wrap" />

@@ -203,4 +203,18 @@
   <data name="Unit.HourMin" xml:space="preserve"><value>{0} ч {1:00} мин</value></data>
   <data name="Status.Manual" xml:space="preserve"><value>Игровой режим вручную {0}</value></data>
   <data name="Remove.Evicted" xml:space="preserve"><value>Модели сейчас выгнаны. Сначала верните их («Вернуть сейчас»), потом удаляйте данные.</value></data>
+  <data name="LmStudio.ServerOff" xml:space="preserve"><value>HTTP-сервер выключен: выгрузить можно через lms, вернуть нельзя</value></data>
+  <data name="LmStudio.Token" xml:space="preserve"><value>LM Studio просит API-токен: введите его в этой карточке</value></data>
+  <data name="Llama.RouterFailed" xml:space="preserve"><value>llama-server не смог загрузить {0}</value></data>
+  <data name="Hint.Notify" xml:space="preserve"><value>Это игра? {0} держит {1} ГБ видеопамяти. Нажмите, чтобы открыть «Игры».</value></data>
+  <data name="Hint.Title" xml:space="preserve"><value>Возможно, игры</value></data>
+  <data name="Hint.Note" xml:space="preserve"><value>Программы на переднем плане, которые держали больше 1,5 ГБ видеопамяти 20 секунд.</value></data>
+  <data name="Games.Budget" xml:space="preserve"><value>ГБ</value></data>
+  <data name="Games.Budget.Tip" xml:space="preserve"><value>Бюджет VRAM: сколько нужно игре. Выгружаются только модели, без которых он не помещается, начиная с самых больших. Пусто — выгружать всё.</value></data>
+  <data name="Journal.Summary" xml:space="preserve"><value>За 7 дней: игр {0} · освобождено {1} ГБ · возврат в среднем {2} с · сторож {3} раз</value></data>
+  <data name="Journal.SummaryEmpty" xml:space="preserve"><value>За 7 дней игр не было</value></data>
+  <data name="Notify.Summary" xml:space="preserve"><value>{0}: {1} · было выгнано {2} ГБ · вернулись за {3} с</value></data>
+  <data name="Models.Token" xml:space="preserve"><value>API-токен (только если LM Studio требует авторизацию)</value></data>
+  <data name="Models.TokenSaved" xml:space="preserve"><value>сохранён, зашифрован для этого пользователя Windows</value></data>
+  <data name="Models.Router" xml:space="preserve"><value>режим router</value></data>
 </root>
