@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VramBouncer/VramBouncer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/VramBouncer.Tests/VramBouncer.Tests.csproj" />
+  </Folder>
+</Solution>
