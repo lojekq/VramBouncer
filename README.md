@@ -59,17 +59,20 @@ During the game a guard checks every 15 s whether a model came back. After the g
 
 ## Download
 
-1. Get **`VramBouncer-x.y.z-win-x64.exe`** from [Releases](https://github.com/lojekq/VramBouncer/releases/latest). Single file, no install, no admin.
-2. Smaller build: `VramBouncer-x.y.z-win-x64-fd.zip` (needs [.NET Desktop Runtime 10](https://dotnet.microsoft.com/download/dotnet/10.0)).
+1. **[Download VramBouncer.exe](https://github.com/lojekq/VramBouncer/releases/latest/download/VramBouncer.exe)** (latest release). One file, no admin rights.
+2. Smaller build: [`VramBouncer-fd.zip`](https://github.com/lojekq/VramBouncer/releases/latest/download/VramBouncer-fd.zip) (needs [.NET Desktop Runtime 10](https://dotnet.microsoft.com/download/dotnet/10.0)).
 3. Optional check: `gh attestation verify <file> -R lojekq/VramBouncer` or compare with `SHA256SUMS.txt`.
 
 Requirements: Windows 11 x64. Windows 10 22H2 should work but is not tested. VRAM totals need an NVIDIA GPU (NVML); on AMD and Intel everything else works and the models return after the grace period.
 
 ## First run
 
-Put the exe into a permanent folder first, for example `%LOCALAPPDATA%\Programs\VramBouncer\`: autostart and the Start menu shortcut point to it.
-On the first start Windows may show a SmartScreen warning (see FAQ). The app lives in the tray: green icon — normal, orange — game mode, gray — paused.
-Open **Models** and press **Check eviction (dry run)**: it lists what would be unloaded, without doing it. Then turn on **Start with Windows** in Settings.
+Run the downloaded exe from anywhere. Windows may show a SmartScreen warning first (see FAQ).
+The app offers to install itself: **Install** copies it to `%LOCALAPPDATA%\Programs\VramBouncer\`, adds a Start menu shortcut, autostart and an entry in Settings → Apps; no admin rights.
+**Run without installing** keeps it portable. To update, run a newer exe the same way: it replaces the installed one and restarts it; models evicted at that moment come back.
+
+The app lives in the tray: green icon — normal, orange — game mode, gray — paused.
+Open **Models** and press **Check eviction (dry run)**: it lists what would be unloaded, without doing it.
 
 If another program restarts your llama-server (a watchdog, a launcher like MLink), turn its llama-server backend off and add its own stop and start commands under **My commands**.
 
@@ -89,7 +92,9 @@ If another program restarts your llama-server (a watchdog, a launcher like MLink
 | Wait for free VRAM | 10 min | After that the models come back anyway, with a warning |
 | Guard interval | 15 s | During a game: a model loaded again is evicted again |
 | Stop llama-server even if I can't start it again | off | Without a readable command line the server is left running |
-| Language, theme, Start with Windows, Start menu shortcut, updates | Windows / off / on | The usual |
+| Start with Windows, Start menu shortcut | on after install | Starts in the tray; a shortcut in the Start menu |
+| Installation | — | Install, or Uninstall when installed |
+| Language, theme, updates | Windows / on | The usual |
 
 Data lives in `%APPDATA%\VramBouncer`: `settings.json`, `state.json`, `history.jsonl` (90 days), `logs\` (including `llama-server.log` of a restarted server).
 
@@ -104,7 +109,7 @@ Smart App Control, if it is on, blocks unsigned files with no way to allow one; 
 
 <details><summary>My antivirus flags it</summary>
 
-It is a false positive: the app has no installer, no packer and no obfuscation, but it does stop and start a llama-server process, which some heuristics dislike.
+It is a false positive: the app has no packer and no obfuscation and installs only into your user folder, but it does stop and start a llama-server process, which some heuristics dislike.
 Please report it to your antivirus vendor and open an issue with the detection name and the SHA256 of the file.
 </details>
 
@@ -128,7 +133,9 @@ A non-game in a game library (wallpapers, overlays, idle games you leave running
 
 <details><summary>How do I uninstall?</summary>
 
-About → **Remove data and autostart**, then delete the exe.
+Settings → **Uninstall**, or Windows Settings → Apps → VRAM Bouncer → Uninstall. You choose whether settings and logs go too.
+If models are evicted at that moment, bring them back first (Restore now): the app refuses to uninstall while it is the only way back for them.
+Without installing: About → **Remove data and autostart**, then delete the exe.
 </details>
 
 ## Privacy

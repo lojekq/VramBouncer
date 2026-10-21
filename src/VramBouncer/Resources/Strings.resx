@@ -39,6 +39,28 @@
 Crash log: {1}
 
 Open the folder?</value></data>
+  <data name="Install.Ask" xml:space="preserve"><value>Install {0}?
+
+It will be copied to {1} and get a Start menu shortcut and an entry in Settings → Apps. No administrator rights needed.</value></data>
+  <data name="Install.Button" xml:space="preserve"><value>Install</value></data>
+  <data name="Install.NoInstall" xml:space="preserve"><value>Run without installing</value></data>
+  <data name="Install.Update" xml:space="preserve"><value>Update {0} {1} → {2}?
+
+The running copy closes and starts again.</value></data>
+  <data name="Install.UpdateButton" xml:space="preserve"><value>Update</value></data>
+  <data name="Install.CloseRunning" xml:space="preserve"><value>{0} is still running. Close it in the tray: right-click the icon → Exit, then press Retry.</value></data>
+  <data name="Install.Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="Install.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Uninstall.Ask" xml:space="preserve"><value>Uninstall {0}?
+
+The program, its Start menu shortcut, autostart and the entry in Settings → Apps will be removed.</value></data>
+  <data name="Uninstall.Data" xml:space="preserve"><value>Also delete settings and logs</value></data>
+  <data name="Uninstall.Button" xml:space="preserve"><value>Uninstall</value></data>
+  <data name="Uninstall.Done" xml:space="preserve"><value>{0} is uninstalled.</value></data>
+  <data name="Uninstall.Leftover" xml:space="preserve"><value>Some files are in use and stayed in {0}. Delete the folder later.</value></data>
+  <data name="Settings.Install" xml:space="preserve"><value>Installation</value></data>
+  <data name="Settings.Installed" xml:space="preserve"><value>Installed in {0}</value></data>
+  <data name="Settings.NotInstalled" xml:space="preserve"><value>Runs without installing, from {0}</value></data>
   <data name="Hotkey.Placeholder" xml:space="preserve"><value>Press a key combination</value></data>
   <data name="Hotkey.Busy" xml:space="preserve"><value>Taken by another program</value></data>
   <data name="Hotkey.Failed" xml:space="preserve"><value>Could not register</value></data>
