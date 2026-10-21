@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using VramBouncer.Demo;
 using VramBouncer.Features;
@@ -34,7 +35,12 @@ public partial class App : Application
         Loc.Apply(Settings.Current.Language);
         Log.Info($"start {AppInfo.Version}{(a.Unknown.Count > 0 ? $", {a.Unknown.Count} unknown argument(s)" : "")}");
 
-        if (a.Demo) DemoData.Fill();
+        if (a.Demo)
+        {
+            // Screenshots: numbers and dates in the language of the picture; real runs keep the Windows regional format
+            CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentUICulture;
+            DemoData.Fill();
+        }
         else if (Install.IsInstalled) InstalledStart(); // Debug builds and exes in Downloads write nothing by themselves
 
         // App features: services, hotkeys, tray items, settings section

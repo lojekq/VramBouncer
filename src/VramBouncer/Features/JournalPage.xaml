@@ -3,7 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:l="clr-namespace:VramBouncer.Shell"
-      xmlns:f="clr-namespace:VramBouncer.Features">
+      xmlns:f="clr-namespace:VramBouncer.Features"
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="Vis" />
     </Page.Resources>
@@ -24,10 +25,10 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="175" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="1.3*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Ellipse Width="10" Height="10" Fill="{Binding Dot}" VerticalAlignment="Top" Margin="0,5,12,0" />
                                 <ui:TextBlock Grid.Column="1" Text="{Binding When}" Appearance="Secondary" />
@@ -38,7 +39,7 @@
                                                   Visibility="{Binding HasGuard, Converter={StaticResource Vis}}" />
                                 </StackPanel>
                                 <ui:TextBlock Grid.Column="3" Text="{Binding Duration}" />
-                                <ui:TextBlock Grid.Column="4" Text="{Binding Result}" Appearance="Secondary" TextWrapping="Wrap" />
+                                <ui:TextBlock Grid.Column="4" Text="{Binding Result}" Appearance="Secondary" TextWrapping="Wrap" MaxWidth="260" />
                             </Grid>
                         </Border>
                     </DataTemplate>
