@@ -50,7 +50,7 @@ Open the folder?</value></data>
   <data name="Status.Idle" xml:space="preserve"><value>No games · models in place</value></data>
   <data name="Status.Evicting" xml:space="preserve"><value>{0} · evicting models…</value></data>
   <data name="Status.InGame" xml:space="preserve"><value>{0} · game mode {1}</value></data>
-  <data name="Status.Grace" xml:space="preserve"><value>{0} closed · models return in {1}</value></data>
+  <data name="Status.Grace" xml:space="preserve"><value>Game closed · models return in {1}</value></data>
   <data name="Status.WaitVram" xml:space="preserve"><value>Game closed · waiting for free VRAM</value></data>
   <data name="Status.Restoring" xml:space="preserve"><value>Bringing models back…</value></data>
   <data name="Status.PausedUntil" xml:space="preserve"><value>Paused until {0}</value></data>
@@ -201,4 +201,6 @@ Cancel: keep running.</value></data>
   <data name="Demo.Toast" xml:space="preserve"><value>Dota 2 → evicted {0} GB: Qwen3.8-27B, qwen3:1.7b, ComfyUI</value></data>
   <data name="Unit.Min" xml:space="preserve"><value>{0} min</value></data>
   <data name="Unit.HourMin" xml:space="preserve"><value>{0} h {1:00} min</value></data>
+  <data name="Status.Manual" xml:space="preserve"><value>Manual game mode {0}</value></data>
+  <data name="Remove.Evicted" xml:space="preserve"><value>Models are evicted right now. Bring them back first (Restore now), then remove the data.</value></data>
 </root>

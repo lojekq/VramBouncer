@@ -165,6 +165,6 @@ public static class AppSettings
         header.Children.Add(new TextBlock { Text = Loc.T(key) });
         if (note is not null)
             header.Children.Add(new TextBlock { Text = Loc.T(note), FontTypography = FontTypography.Caption, Appearance = TextColor.Secondary, TextWrapping = TextWrapping.Wrap });
-        return new CardControl { Header = header, Icon = new SymbolIcon(icon), Content = content, Margin = new(0, 0, 0, 4) };
+        return new CardControl { Header = header, Icon = new SymbolIcon(icon) { FontSize = 24 }, Content = content, Margin = new(0, 0, 0, 4) };
     }
 }

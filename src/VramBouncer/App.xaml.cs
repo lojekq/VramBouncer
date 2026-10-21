@@ -40,6 +40,7 @@ public partial class App : Application
         // App features: services, hotkeys, tray items, settings section
         SettingsPage.AppSection = AppSettings.Create;
         ConfirmExit = Actions.ConfirmExit;
+        RemoveData = () => Engine.I?.HasEvicted == true ? Loc.T("Remove.Evicted") : null; // state.json is the only way back for them
 
         window = new MainWindow();
         if (a.Width > 0) (window.Width, window.Height) = (a.Width, a.Height);

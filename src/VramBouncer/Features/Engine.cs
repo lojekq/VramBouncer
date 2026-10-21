@@ -205,7 +205,7 @@ public sealed class Engine
                 }
                 catch (Exception e) when (!ct.IsCancellationRequested)
                 {
-                    Log.Warn($"{b.Kind}: eviction failed", e);
+                    Log.Warn($"{b.Kind}: eviction failed ({e.GetType().Name})"); // the message may hold paths or command lines: not for logs
                     evicted.RemoveAt(evicted.Count - 1);
                     failed.Add(s with { Skip = e.Message });
                     Notify(Settings.Current.Notify.Errors, string.Format(Loc.T("Notify.EvictFailed"), b.Title, e.Message));
@@ -236,7 +236,7 @@ public sealed class Engine
                 try { if (await b.RestoreAsync(s, ct) is { } w) warnings.Add(w); }
                 catch (Exception e) when (!ct.IsCancellationRequested)
                 {
-                    Log.Warn($"{s.Backend}: restore failed", e);
+                    Log.Warn($"{s.Backend}: restore failed ({e.GetType().Name})");
                     errors.Add($"{s.Label}: {e.Message}");
                 }
             evicted.Remove(s);
@@ -277,7 +277,7 @@ public sealed class Engine
                     Log.Info($"guard: {b.Kind} acted");
                 }
             }
-            catch (Exception e) when (!ct.IsCancellationRequested) { Log.Warn($"{b.Kind}: guard failed", e); }
+            catch (Exception e) when (!ct.IsCancellationRequested) { Log.Warn($"{b.Kind}: guard failed ({e.GetType().Name})"); }
         }
         foreach (var w in guard.Warnings) Notify(Settings.Current.Notify.Errors, w, "models");
         guard.Warnings.Clear();
@@ -317,7 +317,7 @@ public sealed class Engine
         try { return await b.ProbeAsync(ct); }
         catch (Exception e) when (!ct.IsCancellationRequested)
         {
-            Log.Warn($"{b.Kind}: probe failed", e);
+            Log.Warn($"{b.Kind}: probe failed ({e.GetType().Name})");
             return Probe.None(e.Message);
         }
     }

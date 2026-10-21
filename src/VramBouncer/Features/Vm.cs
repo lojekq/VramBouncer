@@ -112,6 +112,7 @@ public sealed class Vm : INotifyPropertyChanged
     {
         Phase.Paused => View.PausedUntil is { } u ? string.Format(Loc.T("Status.PausedUntil"), u.ToLocalTime().ToString("t")) : Loc.T("Status.PausedForever"),
         Phase.Evicting => string.Format(Loc.T("Status.Evicting"), View.Game),
+        Phase.InGame when View.Game == Loc.T("Game.Manual") => string.Format(Loc.T("Status.Manual"), Clock(Now() - (View.Since ?? Now()))),
         Phase.InGame => string.Format(Loc.T("Status.InGame"), View.Game, Clock(Now() - (View.Since ?? Now()))),
         Phase.Cooldown when Left() is { } left => string.Format(Loc.T("Status.Grace"), View.Game, Clock(left)),
         Phase.Cooldown => Loc.T("Status.WaitVram"),

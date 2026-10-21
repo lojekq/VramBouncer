@@ -50,7 +50,7 @@
   <data name="Status.Idle" xml:space="preserve"><value>Игр нет · модели на месте</value></data>
   <data name="Status.Evicting" xml:space="preserve"><value>{0} · выгоняю модели…</value></data>
   <data name="Status.InGame" xml:space="preserve"><value>{0} · игровой режим {1}</value></data>
-  <data name="Status.Grace" xml:space="preserve"><value>{0} закрыта · модели вернутся через {1}</value></data>
+  <data name="Status.Grace" xml:space="preserve"><value>Игра закрыта · модели вернутся через {1}</value></data>
   <data name="Status.WaitVram" xml:space="preserve"><value>Игра закрыта · жду свободную VRAM</value></data>
   <data name="Status.Restoring" xml:space="preserve"><value>Возвращаю модели…</value></data>
   <data name="Status.PausedUntil" xml:space="preserve"><value>Пауза до {0}</value></data>
@@ -201,4 +201,6 @@
   <data name="Demo.Toast" xml:space="preserve"><value>Dota 2 → выгнано {0} ГБ: Qwen3.8-27B, qwen3:1.7b, ComfyUI</value></data>
   <data name="Unit.Min" xml:space="preserve"><value>{0} мин</value></data>
   <data name="Unit.HourMin" xml:space="preserve"><value>{0} ч {1:00} мин</value></data>
+  <data name="Status.Manual" xml:space="preserve"><value>Игровой режим вручную {0}</value></data>
+  <data name="Remove.Evicted" xml:space="preserve"><value>Модели сейчас выгнаны. Сначала верните их («Вернуть сейчас»), потом удаляйте данные.</value></data>
 </root>
