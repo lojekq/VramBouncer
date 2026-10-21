@@ -171,15 +171,19 @@ public sealed class Engine
         var (s, acts) = Bouncer.Next(state, input, Timings());
         state = s;
         foreach (var a in acts)
-        {
-            switch (a)
+            try
             {
-                case Act.Evict: await Evict(ct); break;
-                case Act.Restore or Act.RestoreLate: await Restore(a == Act.RestoreLate, ct); break;
-                case Act.Guard: await GuardStep(ct); break;
+                switch (a)
+                {
+                    case Act.Evict: await Evict(ct); break;
+                    case Act.Restore or Act.RestoreLate: await Restore(a == Act.RestoreLate, ct); break;
+                    case Act.Guard: await GuardStep(ct); break;
+                }
             }
-            if (a is Act.Evict or Act.Restore or Act.RestoreLate) (state, _) = Bouncer.Next(state, input with { Now = DateTime.UtcNow, Cmd = Cmd.Done }, Timings());
-        }
+            finally // even after a failure (state.json not writable): never stuck in Evicting or Restoring
+            {
+                if (a is Act.Evict or Act.Restore or Act.RestoreLate) (state, _) = Bouncer.Next(state, input with { Now = DateTime.UtcNow, Cmd = Cmd.Done }, Timings());
+            }
         if (state.Phase != before)
         {
             Log.Info($"{before} -> {state.Phase}");
