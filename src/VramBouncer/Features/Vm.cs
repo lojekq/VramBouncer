@@ -88,8 +88,11 @@ public sealed class Vm : INotifyPropertyChanged
     GameCatalog.Result? shownCatalog;
     string filter = "";
 
+    bool applied;
+
     public void Apply(View v)
     {
+        applied = true;
         View = v;
         Models = BuildModels(v);
         Bar = BuildBar(v);
@@ -126,7 +129,7 @@ public sealed class Vm : INotifyPropertyChanged
     public bool HasGpu => View.Gpu is not null;
     public string GpuCaption => View.Gpu is { } g
         ? string.Format(Loc.T("Overview.Gpu"), g.Name.Replace("NVIDIA GeForce ", ""), Engine.Gb(g.Total), Engine.Gb(g.Free))
-        : Loc.T("Overview.NoNvml");
+        : applied ? Loc.T("Overview.NoNvml") : ""; // before the first picture nothing is known yet
     public bool NoModels => Models.Count == 0;
     public string LastEvent => View.LastEvent ?? Loc.T("Overview.NoEvents");
     public bool CanEvict => View.Phase is Phase.Idle;
