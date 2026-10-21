@@ -1,0 +1,156 @@
+<Page x:Class="VramBouncer.Features.ModelsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:l="clr-namespace:VramBouncer.Shell"
+      xmlns:f="clr-namespace:VramBouncer.Features">
+    <Page.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+        <Style x:Key="Label" TargetType="ui:TextBlock">
+            <Setter Property="Appearance" Value="Secondary" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+        </Style>
+    </Page.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,12,24,24" MaxWidth="900">
+            <ui:TextBlock FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{l:T Page.Models}" />
+            <ui:TextBlock Appearance="Secondary" Text="{l:T Models.Subtitle}" Margin="0,4,0,12" TextWrapping="Wrap" />
+
+            <!-- llama-server -->
+            <Border Style="{StaticResource Card}" DataContext="{x:Static f:ModelsPage.Llama}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <ui:TextBlock Text="llama-server" FontTypography="BodyStrong" />
+                            <ui:TextBlock x:Name="LlamaStatus" Appearance="Secondary" FontTypography="Caption" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding On}" />
+                    </Grid>
+                    <WrapPanel Margin="0,10,0,0">
+                        <ui:TextBlock Text="{l:T Models.Port}" Style="{StaticResource Label}" />
+                        <ui:TextBox Text="{Binding Port, UpdateSourceTrigger=LostFocus}" Width="90" Margin="0,0,20,0" />
+                        <ui:TextBlock Text="{l:T Models.RestorePolicy}" Style="{StaticResource Label}" />
+                        <ComboBox SelectedValue="{Binding Restore}" SelectedValuePath="Tag" MinWidth="170">
+                            <ComboBoxItem Tag="always" Content="{l:T Policy.Always}" />
+                            <ComboBoxItem Tag="never" Content="{l:T Policy.Never}" />
+                        </ComboBox>
+                    </WrapPanel>
+                    <ui:TextBlock Text="{l:T Models.Captured}" Style="{StaticResource Label}" Margin="0,10,0,4" />
+                    <ui:TextBox x:Name="LlamaCaptured" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="12" PlaceholderText="{l:T Models.NotRunning}" />
+                    <ui:TextBlock Text="{l:T Models.EditCommand}" Style="{StaticResource Label}" Margin="0,10,0,4" />
+                    <ui:TextBox Text="{Binding Command, UpdateSourceTrigger=LostFocus, TargetNullValue=''}" FontFamily="Consolas" FontSize="12" PlaceholderText="{l:T Models.EditCommand.Placeholder}" />
+                    <ItemsControl x:Name="LlamaWarnings" Margin="0,8,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                    <ui:SymbolIcon Symbol="Warning16" Foreground="#F0883E" Margin="0,0,6,0" />
+                                    <ui:TextBlock Text="{Binding}" TextWrapping="Wrap" FontTypography="Caption" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <ui:Button x:Name="HandsOffButton" Content="{l:T Models.HandsOff.Reset}" Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Ollama -->
+            <Border Style="{StaticResource Card}" DataContext="{x:Static f:ModelsPage.Ollama}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <ui:TextBlock Text="Ollama" FontTypography="BodyStrong" />
+                            <ui:TextBlock x:Name="OllamaStatus" Appearance="Secondary" FontTypography="Caption" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding On}" />
+                    </Grid>
+                    <WrapPanel Margin="0,10,0,0">
+                        <ui:TextBlock Text="{l:T Models.Address}" Style="{StaticResource Label}" />
+                        <ui:TextBox x:Name="OllamaUrl" Text="{Binding Url, UpdateSourceTrigger=LostFocus, TargetNullValue=''}" Width="230" Margin="0,0,20,0" />
+                        <ui:TextBlock Text="{l:T Models.RestorePolicy}" Style="{StaticResource Label}" />
+                        <ComboBox SelectedValue="{Binding Restore}" SelectedValuePath="Tag" MinWidth="170">
+                            <ComboBoxItem Tag="always" Content="{l:T Policy.Always}" />
+                            <ComboBoxItem Tag="longlived" Content="{l:T Policy.LongLived}" />
+                            <ComboBoxItem Tag="never" Content="{l:T Policy.Never}" />
+                        </ComboBox>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ComfyUI -->
+            <Border Style="{StaticResource Card}" DataContext="{x:Static f:ModelsPage.Comfy}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <ui:TextBlock Text="ComfyUI" FontTypography="BodyStrong" />
+                            <ui:TextBlock x:Name="ComfyStatus" Appearance="Secondary" FontTypography="Caption" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding On}" />
+                    </Grid>
+                    <WrapPanel Margin="0,10,0,0">
+                        <ui:TextBlock Text="{l:T Models.Address}" Style="{StaticResource Label}" />
+                        <ui:TextBox Text="{Binding Url, UpdateSourceTrigger=LostFocus}" Width="230" />
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- My commands -->
+            <ui:TextBlock FontTypography="Subtitle" Text="{l:T Models.Commands}" Margin="0,12,0,4" />
+            <ui:TextBlock Appearance="Secondary" Text="{l:T Models.Commands.Note}" Margin="0,0,0,8" TextWrapping="Wrap" />
+            <ItemsControl x:Name="CommandList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type f:CommandRow}">
+                        <Border Style="{StaticResource Card}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                                </Grid.RowDefinitions>
+                                <ui:TextBlock Text="{l:T Command.Name}" Style="{StaticResource Label}" />
+                                <Grid Grid.Column="1">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <ui:TextBox Text="{Binding Cmd.Name, UpdateSourceTrigger=LostFocus}" MaxWidth="260" HorizontalAlignment="Left" MinWidth="200" />
+                                    <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding Cmd.On}" />
+                                </Grid>
+                                <ui:TextBlock Grid.Row="1" Text="{l:T Command.Evict}" Style="{StaticResource Label}" />
+                                <ui:TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Cmd.Evict, UpdateSourceTrigger=LostFocus}" FontFamily="Consolas" FontSize="12" Margin="0,6,0,0" PlaceholderText="{l:T Command.Evict.Placeholder}" />
+                                <ui:TextBlock Grid.Row="2" Text="{l:T Command.Restore}" Style="{StaticResource Label}" />
+                                <ui:TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Cmd.Restore, UpdateSourceTrigger=LostFocus}" FontFamily="Consolas" FontSize="12" Margin="0,6,0,0" PlaceholderText="{l:T Command.Restore.Placeholder}" />
+                                <ui:TextBlock Grid.Row="3" Text="{l:T Command.Check}" Style="{StaticResource Label}" />
+                                <ui:TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Cmd.Check, UpdateSourceTrigger=LostFocus}" FontFamily="Consolas" FontSize="12" Margin="0,6,0,0" PlaceholderText="{l:T Command.Check.Placeholder}" />
+                                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="0,8,0,0">
+                                    <ui:Button Content="{l:T Command.RunCheck}" Click="RunCheck" Tag="{Binding}" Margin="0,0,8,0" />
+                                    <ui:Button Content="{l:T Command.Remove}" Click="Remove" Tag="{Binding}" Appearance="Transparent" Margin="0,0,12,0" />
+                                    <ui:TextBlock Text="{Binding CheckText}" Appearance="Secondary" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ui:Button x:Name="AddCommand" Icon="{ui:SymbolIcon Add24}" Content="{l:T Command.Add}" Margin="0,0,0,20" />
+
+            <ui:Button x:Name="PlanButton" Appearance="Primary" Icon="{ui:SymbolIcon ClipboardTaskListLtr24}" Content="{l:T Models.Plan}" />
+            <ItemsControl x:Name="PlanList" Margin="0,8,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ui:TextBlock Text="{Binding StringFormat='•  {0}'}" TextWrapping="Wrap" Margin="0,2" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

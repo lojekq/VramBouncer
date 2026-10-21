@@ -31,8 +31,14 @@
         <ui:NavigationView x:Name="Nav" Grid.Row="2" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed"
                            IsPaneToggleVisible="False" OpenPaneLength="220">
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="{l:T Page.Main}" Icon="{ui:SymbolIcon Home24}"
-                                       TargetPageType="{x:Type f:MainPage}" TargetPageTag="main" />
+                <ui:NavigationViewItem Content="{l:T Page.Overview}" Icon="{ui:SymbolIcon Gauge24}"
+                                       TargetPageType="{x:Type f:OverviewPage}" TargetPageTag="overview" />
+                <ui:NavigationViewItem Content="{l:T Page.Games}" Icon="{ui:SymbolIcon Games24}"
+                                       TargetPageType="{x:Type f:GamesPage}" TargetPageTag="games" />
+                <ui:NavigationViewItem Content="{l:T Page.Models}" Icon="{ui:SymbolIcon BrainCircuit24}"
+                                       TargetPageType="{x:Type f:ModelsPage}" TargetPageTag="models" />
+                <ui:NavigationViewItem Content="{l:T Page.Journal}" Icon="{ui:SymbolIcon History24}"
+                                       TargetPageType="{x:Type f:JournalPage}" TargetPageTag="journal" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem Content="{l:T Page.Settings}" Icon="{ui:SymbolIcon Settings24}"

@@ -7,7 +7,6 @@
   <data name="Tray.Open" xml:space="preserve"><value>Open</value></data>
   <data name="Tray.Exit" xml:space="preserve"><value>Exit</value></data>
   <data name="Tray.Hidden" xml:space="preserve"><value>Still running in the notification area. To quit, right-click the icon and choose Exit.</value></data>
-  <data name="Page.Main" xml:space="preserve"><value>Home</value></data>
   <data name="Page.Settings" xml:space="preserve"><value>Settings</value></data>
   <data name="Page.About" xml:space="preserve"><value>About</value></data>
   <data name="Settings.Language" xml:space="preserve"><value>Language</value></data>
@@ -43,13 +42,163 @@ Open the folder?</value></data>
   <data name="Hotkey.Placeholder" xml:space="preserve"><value>Press a key combination</value></data>
   <data name="Hotkey.Busy" xml:space="preserve"><value>Taken by another program</value></data>
   <data name="Hotkey.Failed" xml:space="preserve"><value>Could not register</value></data>
-  <data name="Sample.Hotkey" xml:space="preserve"><value>Hotkey to show the window</value></data>
-  <data name="Main.Title" xml:space="preserve"><value>Tasks</value></data>
-  <data name="Main.Subtitle" xml:space="preserve"><value>Sample page of the template. Replace it with the app's own pages.</value></data>
-  <data name="Main.Empty" xml:space="preserve"><value>Nothing here yet.</value></data>
-  <data name="Demo.Build" xml:space="preserve"><value>Project build</value></data>
-  <data name="Demo.Dataset" xml:space="preserve"><value>Dataset download</value></data>
-  <data name="Demo.Report" xml:space="preserve"><value>Report for Alex</value></data>
-  <data name="Demo.Daily" xml:space="preserve"><value>every day at 6 PM</value></data>
-  <data name="Demo.Backup" xml:space="preserve"><value>Nightly backup</value></data>
+  <data name="Page.Overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="Page.Games" xml:space="preserve"><value>Games</value></data>
+  <data name="Page.Models" xml:space="preserve"><value>Models</value></data>
+  <data name="Page.Journal" xml:space="preserve"><value>Journal</value></data>
+  <data name="Unit.GB" xml:space="preserve"><value>GB</value></data>
+  <data name="Status.Idle" xml:space="preserve"><value>No games · models in place</value></data>
+  <data name="Status.Evicting" xml:space="preserve"><value>{0} · evicting models…</value></data>
+  <data name="Status.InGame" xml:space="preserve"><value>{0} · game mode {1}</value></data>
+  <data name="Status.Grace" xml:space="preserve"><value>{0} closed · models return in {1}</value></data>
+  <data name="Status.WaitVram" xml:space="preserve"><value>Game closed · waiting for free VRAM</value></data>
+  <data name="Status.Restoring" xml:space="preserve"><value>Bringing models back…</value></data>
+  <data name="Status.PausedUntil" xml:space="preserve"><value>Paused until {0}</value></data>
+  <data name="Status.PausedForever" xml:space="preserve"><value>Paused until restart</value></data>
+  <data name="Overview.Gpu" xml:space="preserve"><value>{0} · {1} GB · {2} GB free</value></data>
+  <data name="Overview.NoNvml" xml:space="preserve"><value>No NVIDIA GPU data: VRAM totals are hidden, models return after the grace period</value></data>
+  <data name="Overview.Game" xml:space="preserve"><value>Game</value></data>
+  <data name="Overview.Other" xml:space="preserve"><value>other</value></data>
+  <data name="Overview.Free" xml:space="preserve"><value>free</value></data>
+  <data name="Overview.EvictNow" xml:space="preserve"><value>Evict now</value></data>
+  <data name="Overview.RestoreNow" xml:space="preserve"><value>Restore now</value></data>
+  <data name="Overview.Pause" xml:space="preserve"><value>Pause</value></data>
+  <data name="Overview.Models" xml:space="preserve"><value>Models</value></data>
+  <data name="Overview.NoModels" xml:space="preserve"><value>No local models are loaded.</value></data>
+  <data name="Overview.NoEvents" xml:space="preserve"><value>Nothing happened yet</value></data>
+  <data name="Model.Loaded" xml:space="preserve"><value>loaded</value></data>
+  <data name="Model.Skip" xml:space="preserve"><value>loaded, left alone: {0}</value></data>
+  <data name="Model.Out" xml:space="preserve"><value>evicted, returns after the game</value></data>
+  <data name="Model.OutSoon" xml:space="preserve"><value>evicted, returning soon</value></data>
+  <data name="Model.OutNoRestore" xml:space="preserve"><value>evicted, loads again on the next request</value></data>
+  <data name="Model.Returning" xml:space="preserve"><value>coming back</value></data>
+  <data name="Model.Error" xml:space="preserve"><value>error: {0}</value></data>
+  <data name="Pause.15m" xml:space="preserve"><value>15 minutes</value></data>
+  <data name="Pause.1h" xml:space="preserve"><value>1 hour</value></data>
+  <data name="Pause.Restart" xml:space="preserve"><value>Until restart</value></data>
+  <data name="Pause.Off" xml:space="preserve"><value>Resume</value></data>
+  <data name="Tray.Manual" xml:space="preserve"><value>Game mode (manual)</value></data>
+  <data name="Tray.Pause" xml:space="preserve"><value>Pause</value></data>
+  <data name="Tray.Evict" xml:space="preserve"><value>Evict models now</value></data>
+  <data name="Tray.Restore" xml:space="preserve"><value>Restore models now</value></data>
+  <data name="Game.Manual" xml:space="preserve"><value>Manual game mode</value></data>
+  <data name="Event.Evicted" xml:space="preserve"><value>evicted</value></data>
+  <data name="Event.Recovered" xml:space="preserve"><value>After a restart: {0} model(s) are still out, bringing them back</value></data>
+  <data name="Notify.NothingLoaded" xml:space="preserve"><value>nothing was loaded</value></data>
+  <data name="Notify.EvictFailed" xml:space="preserve"><value>{0}: could not evict. {1}</value></data>
+  <data name="Notify.Restored" xml:space="preserve"><value>Models restored in {0} s</value></data>
+  <data name="Notify.GuardCount" xml:space="preserve"><value>reloaded during the game {0} time(s)</value></data>
+  <data name="Notify.Recognized" xml:space="preserve"><value>Recognized as a game: {0}. Not a game? Click to open Games.</value></data>
+  <data name="Restore.Busy" xml:space="preserve"><value>VRAM was still busy ({0} GB used): a model may have loaded partly on the CPU</value></data>
+  <data name="Restore.NotLoaded" xml:space="preserve"><value>{0} is not in memory after the load</value></data>
+  <data name="Restore.Partial" xml:space="preserve"><value>{0} loaded only partly into VRAM</value></data>
+  <data name="Guard.Reloaded" xml:space="preserve"><value>{0} was loaded during the game → evicted again</value></data>
+  <data name="Guard.Watchdog" xml:space="preserve"><value>llama-server is restarted by another program ({0}). Left alone; use My commands for it.</value></data>
+  <data name="Guard.LlamaStarted" xml:space="preserve"><value>llama-server on :{0} started during the game; left running</value></data>
+  <data name="Llama.DebugPort" xml:space="preserve"><value>Debug build: port 8080 is never touched</value></data>
+  <data name="Llama.Elevated" xml:space="preserve"><value>runs as administrator, can't be stopped</value></data>
+  <data name="Llama.PortTaken" xml:space="preserve"><value>port {0} belongs to another program</value></data>
+  <data name="Llama.Relative" xml:space="preserve"><value>relative path {0}: a restart may not find it; use Edit command</value></data>
+  <data name="Llama.Parent" xml:space="preserve"><value>started by {0}: looks like a watchdog restarts it; consider My commands</value></data>
+  <data name="Llama.HandsOff" xml:space="preserve"><value>another program restarts it: left alone</value></data>
+  <data name="Llama.NoCommand" xml:space="preserve"><value>its command line can't be read, so it couldn't be started again</value></data>
+  <data name="Llama.Gone" xml:space="preserve"><value>the server is not running any more</value></data>
+  <data name="Llama.NotKilled" xml:space="preserve"><value>did not stop in 10 s</value></data>
+  <data name="Llama.Exited" xml:space="preserve"><value>llama-server exited with code {0}; see logs\llama-server.log</value></data>
+  <data name="Llama.NoHealth" xml:space="preserve"><value>/health did not answer 200 in 5 minutes; see logs\llama-server.log</value></data>
+  <data name="Command.Failed" xml:space="preserve"><value>{0}: exit code {1}. {2}</value></data>
+  <data name="Command.Timeout" xml:space="preserve"><value>{0} did not finish in {1} s</value></data>
+  <data name="Command.CheckFailed" xml:space="preserve"><value>the check could not run</value></data>
+  <data name="Command.Loaded" xml:space="preserve"><value>loaded (exit code 0)</value></data>
+  <data name="Command.NotLoaded" xml:space="preserve"><value>not loaded</value></data>
+  <data name="Command.NoCheck" xml:space="preserve"><value>no check command</value></data>
+  <data name="Command.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Command.Evict" xml:space="preserve"><value>Evict</value></data>
+  <data name="Command.Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="Command.Check" xml:space="preserve"><value>Check</value></data>
+  <data name="Command.Evict.Placeholder" xml:space="preserve"><value>program and arguments, e.g. C:\tools\model.exe stop</value></data>
+  <data name="Command.Restore.Placeholder" xml:space="preserve"><value>optional: brings the model back after the game</value></data>
+  <data name="Command.Check.Placeholder" xml:space="preserve"><value>optional: exit code 0 = the model is loaded</value></data>
+  <data name="Command.RunCheck" xml:space="preserve"><value>Check</value></data>
+  <data name="Command.Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Command.Add" xml:space="preserve"><value>Add command</value></data>
+  <data name="Command.NewName" xml:space="preserve"><value>My server</value></data>
+  <data name="Models.Subtitle" xml:space="preserve"><value>What is evicted when a game starts. Only loopback addresses; each server is unloaded by its own API.</value></data>
+  <data name="Models.Port" xml:space="preserve"><value>Port</value></data>
+  <data name="Models.Address" xml:space="preserve"><value>Address</value></data>
+  <data name="Models.RestorePolicy" xml:space="preserve"><value>Bring back</value></data>
+  <data name="Models.Captured" xml:space="preserve"><value>Captured command</value></data>
+  <data name="Models.NotRunning" xml:space="preserve"><value>not running</value></data>
+  <data name="Models.EditCommand" xml:space="preserve"><value>Edit command (empty: the captured one)</value></data>
+  <data name="Models.EditCommand.Placeholder" xml:space="preserve"><value>e.g. C:\llm\start-server.bat</value></data>
+  <data name="Models.HandsOff.Reset" xml:space="preserve"><value>Manage it again</value></data>
+  <data name="Models.Commands" xml:space="preserve"><value>My commands</value></data>
+  <data name="Models.Commands.Note" xml:space="preserve"><value>For MLink, llama-swap, WSL, Docker and anything else: programs run with no window, exit code 0 = done. Check runs only the check command.</value></data>
+  <data name="Models.Plan" xml:space="preserve"><value>Check eviction (dry run)</value></data>
+  <data name="Models.Off" xml:space="preserve"><value>off</value></data>
+  <data name="Models.Found" xml:space="preserve"><value>found</value></data>
+  <data name="Models.NotFound" xml:space="preserve"><value>not found</value></data>
+  <data name="Models.NotRunningPort" xml:space="preserve"><value>not running on :{0}</value></data>
+  <data name="Models.NothingLoaded" xml:space="preserve"><value>nothing loaded</value></data>
+  <data name="Models.Loading" xml:space="preserve"><value>loading</value></data>
+  <data name="Models.NotLoopback" xml:space="preserve"><value>only loopback addresses are allowed</value></data>
+  <data name="Policy.Always" xml:space="preserve"><value>always</value></data>
+  <data name="Policy.LongLived" xml:space="preserve"><value>only long-lived</value></data>
+  <data name="Policy.Never" xml:space="preserve"><value>never</value></data>
+  <data name="Plan.Unload" xml:space="preserve"><value>{0}: unload {1} ({2} GB)</value></data>
+  <data name="Plan.Kill" xml:space="preserve"><value>{0}: stop {1} ({2} GB), start it again with the same command after the game</value></data>
+  <data name="Plan.Command" xml:space="preserve"><value>{0}: run Evict</value></data>
+  <data name="Plan.Skip" xml:space="preserve"><value>{0}: {1} is left alone: {2}</value></data>
+  <data name="Plan.NoRestore" xml:space="preserve"><value>not brought back</value></data>
+  <data name="Plan.NotFound" xml:space="preserve"><value>{0}: not found</value></data>
+  <data name="Plan.Nothing" xml:space="preserve"><value>Nothing to evict right now</value></data>
+  <data name="Games.Subtitle" xml:space="preserve"><value>Steam and Epic libraries are found by themselves. A running game turns game mode on; Not a game moves it to the exclusions.</value></data>
+  <data name="Games.Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Games.AddExe" xml:space="preserve"><value>Add exe…</value></data>
+  <data name="Games.AddFolder" xml:space="preserve"><value>Add folder…</value></data>
+  <data name="Games.Refresh" xml:space="preserve"><value>Rescan libraries</value></data>
+  <data name="Games.Evict" xml:space="preserve"><value>Evict models</value></data>
+  <data name="Games.NotAGame" xml:space="preserve"><value>Not a game</value></data>
+  <data name="Games.IsAGame" xml:space="preserve"><value>It's a game</value></data>
+  <data name="Games.Excluded" xml:space="preserve"><value>Exclusions</value></data>
+  <data name="Games.Excluded.Note" xml:space="preserve"><value>Apps from game libraries that are not games. Crash handlers and redistributable installers inside game folders are ignored too.</value></data>
+  <data name="Games.ByDefault" xml:space="preserve"><value>excluded by default</value></data>
+  <data name="Games.ByYou" xml:space="preserve"><value>excluded by you</value></data>
+  <data name="Games.ExeFilter" xml:space="preserve"><value>Programs</value></data>
+  <data name="Source.Steam" xml:space="preserve"><value>Steam</value></data>
+  <data name="Source.Epic" xml:space="preserve"><value>Epic</value></data>
+  <data name="Source.Manual" xml:space="preserve"><value>Manual</value></data>
+  <data name="Journal.Subtitle" xml:space="preserve"><value>One line per game: what was evicted, what the guard caught and how long the restore took. Kept for 90 days.</value></data>
+  <data name="Journal.OpenLogs" xml:space="preserve"><value>Open logs folder</value></data>
+  <data name="Journal.Empty" xml:space="preserve"><value>No game sessions yet.</value></data>
+  <data name="Journal.Nothing" xml:space="preserve"><value>nothing was loaded</value></data>
+  <data name="Journal.Back" xml:space="preserve"><value>back in {0} s</value></data>
+  <data name="Journal.BackWarn" xml:space="preserve"><value>back in {0} s · {1}</value></data>
+  <data name="Journal.Error" xml:space="preserve"><value>error: {0}</value></data>
+  <data name="Journal.Pending" xml:space="preserve"><value>models are out</value></data>
+  <data name="Settings.Bouncer" xml:space="preserve"><value>VRAM Bouncer</value></data>
+  <data name="Settings.Grace" xml:space="preserve"><value>Grace period, s</value></data>
+  <data name="Settings.Grace.Note" xml:space="preserve"><value>How long no game process must run before models come back. Covers a game restart and launcher hand-offs.</value></data>
+  <data name="Settings.Margin" xml:space="preserve"><value>VRAM margin, GB</value></data>
+  <data name="Settings.Margin.Note" xml:space="preserve"><value>Restore waits until free VRAM ≥ evicted + margin.</value></data>
+  <data name="Settings.WaitVram" xml:space="preserve"><value>Wait for free VRAM, min</value></data>
+  <data name="Settings.WaitVram.Note" xml:space="preserve"><value>After that, models come back anyway with a warning.</value></data>
+  <data name="Settings.Guard" xml:space="preserve"><value>Guard interval, s</value></data>
+  <data name="Settings.Guard.Note" xml:space="preserve"><value>During a game: a model loaded again is evicted again and written to the journal.</value></data>
+  <data name="Settings.Notify" xml:space="preserve"><value>Notifications</value></data>
+  <data name="Settings.Notify.Evict" xml:space="preserve"><value>eviction</value></data>
+  <data name="Settings.Notify.Restore" xml:space="preserve"><value>restore</value></data>
+  <data name="Settings.Notify.Errors" xml:space="preserve"><value>errors</value></data>
+  <data name="Settings.Notify.Summary" xml:space="preserve"><value>summary after a game</value></data>
+  <data name="Settings.KillAnyway" xml:space="preserve"><value>Stop llama-server even if I can't start it again</value></data>
+  <data name="Settings.KillAnyway.Note" xml:space="preserve"><value>Off by default: without a readable command line the server is left running.</value></data>
+  <data name="Exit.Message" xml:space="preserve"><value>Models are evicted.
+
+Yes: bring them back now and exit.
+No: exit now, they come back at the next start.
+Cancel: keep running.</value></data>
+  <data name="Demo.Emulator" xml:space="preserve"><value>My emulator</value></data>
+  <data name="Demo.Toast" xml:space="preserve"><value>Dota 2 → evicted {0} GB: Qwen3.8-27B, qwen3:1.7b, ComfyUI</value></data>
+  <data name="Unit.Min" xml:space="preserve"><value>{0} min</value></data>
+  <data name="Unit.HourMin" xml:space="preserve"><value>{0} h {1:00} min</value></data>
 </root>

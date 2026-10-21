@@ -8,10 +8,10 @@ public partial class MainWindow
     {
         InitializeComponent();
         ElevatedBar.IsOpen = AppInfo.IsElevated;
-        Loaded += (_, _) => { if (Nav.SelectedItem is null) Navigate("main"); };
+        Loaded += (_, _) => { if (Nav.SelectedItem is null) Navigate("overview"); };
     }
 
-    /// <summary>By TargetPageTag: "main", "settings", "about", app pages.</summary>
+    /// <summary>By TargetPageTag: "overview", "games", "models", "journal", "settings", "about", app pages.</summary>
     public void Navigate(string page) => Nav.Navigate(page);
 
     public void ShowUpdate(string version, string url)

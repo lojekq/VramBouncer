@@ -1,0 +1,73 @@
+<Page x:Class="VramBouncer.Features.GamesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:l="clr-namespace:VramBouncer.Shell"
+      xmlns:f="clr-namespace:VramBouncer.Features">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,12,24,24" MaxWidth="900">
+            <ui:TextBlock FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{l:T Page.Games}" />
+            <ui:TextBlock Appearance="Secondary" Text="{l:T Games.Subtitle}" Margin="0,4,0,12" TextWrapping="Wrap" />
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBox x:Name="Search" PlaceholderText="{l:T Games.Search}" Icon="{ui:SymbolIcon Search24}" Margin="0,0,8,0" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <ui:Button x:Name="AddExe" Icon="{ui:SymbolIcon Add24}" Content="{l:T Games.AddExe}" Margin="0,0,8,0" />
+                    <ui:Button x:Name="AddFolder" Icon="{ui:SymbolIcon FolderAdd24}" Content="{l:T Games.AddFolder}" Margin="0,0,8,0" />
+                    <ui:Button x:Name="Refresh" Icon="{ui:SymbolIcon ArrowClockwise24}" ToolTip="{l:T Games.Refresh}" />
+                </StackPanel>
+            </Grid>
+
+            <ItemsControl ItemsSource="{Binding Games}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type f:GameRow}">
+                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="4" Padding="14,8" Margin="0,0,0,4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="70" />
+                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBlock Text="{Binding Name}" FontTypography="BodyStrong" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip="{Binding Name}" />
+                                <ui:TextBlock Grid.Column="1" Text="{Binding Source}" Appearance="Secondary" VerticalAlignment="Center" />
+                                <ui:TextBlock Grid.Column="2" Text="{Binding Root}" Appearance="Tertiary" FontTypography="Caption" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip="{Binding Root}" />
+                                <ui:ToggleSwitch Grid.Column="3" IsChecked="{Binding Evict}" OnContent="{l:T Games.Evict}" OffContent="{l:T Games.Evict}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                <ui:Button Grid.Column="4" Content="{l:T Games.NotAGame}" Appearance="Transparent" Click="NotAGame" Tag="{Binding}" Padding="8,4" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <ui:TextBlock FontTypography="Subtitle" Text="{l:T Games.Excluded}" Margin="0,20,0,4" />
+            <ui:TextBlock Appearance="Secondary" Text="{l:T Games.Excluded.Note}" Margin="0,0,0,8" TextWrapping="Wrap" />
+            <ItemsControl ItemsSource="{Binding Excluded}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type f:GameRow}">
+                        <Border Background="{DynamicResource ControlFillColorDisabledBrush}" CornerRadius="4" Padding="14,6" Margin="0,0,0,4" Opacity="0.85">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="70" />
+                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBlock Text="{Binding Name}" Appearance="Secondary" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                <ui:TextBlock Grid.Column="1" Text="{Binding Source}" Appearance="Tertiary" VerticalAlignment="Center" />
+                                <ui:TextBlock Grid.Column="2" Text="{Binding Reason}" Appearance="Tertiary" FontTypography="Caption" VerticalAlignment="Center" />
+                                <ui:Button Grid.Column="3" Content="{l:T Games.IsAGame}" Appearance="Transparent" Click="IsAGame" Tag="{Binding}" Padding="8,4" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

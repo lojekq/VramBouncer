@@ -37,9 +37,9 @@ public partial class App : Application
         if (a.Demo) DemoData.Fill();
         else if (Install.IsInstalled) InstalledStart(); // Debug builds and exes in Downloads write nothing by themselves
 
-        // App features: services, hotkeys, tray items, settings section (template sample below)
-        SettingsPage.AppSection = SampleSettings.Create;
-        SampleSettings.Apply();
+        // App features: services, hotkeys, tray items, settings section
+        SettingsPage.AppSection = AppSettings.Create;
+        ConfirmExit = Actions.ConfirmExit;
 
         window = new MainWindow();
         if (a.Width > 0) (window.Width, window.Height) = (a.Width, a.Height);
@@ -54,9 +54,15 @@ public partial class App : Application
             Settings.Save();
             Tray.Notify(AppInfo.DisplayName, Loc.T("Tray.Hidden"));
         };
+        window.IsVisibleChanged += (_, _) => Vm.I.WindowVisible = window.IsVisible;
         Capture.Attach(window, () => { if (a.Autoplay) Autoplay.Start(window); });
 
-        if (a.Screenshot is null) Tray.Create(ShowMain, () => Quit());
+        if (a.Screenshot is null)
+        {
+            Tray.Create(ShowMain, () => Quit(), TrayState.Items());
+            TrayState.Attach();
+        }
+        if (!a.Demo) Engine.Start(); // after the tray: the start-up check may already notify
         SessionEnding += (_, _) => RaiseExiting();
         Updates.Found += (version, url) =>
         {

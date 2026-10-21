@@ -1,0 +1,49 @@
+<Page x:Class="VramBouncer.Features.JournalPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:l="clr-namespace:VramBouncer.Shell"
+      xmlns:f="clr-namespace:VramBouncer.Features">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="Vis" />
+    </Page.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,12,24,24" MaxWidth="900">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <ui:TextBlock FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{l:T Page.Journal}" />
+                <ui:Button x:Name="OpenLogs" Grid.Column="1" Icon="{ui:SymbolIcon FolderOpen24}" Content="{l:T Journal.OpenLogs}" VerticalAlignment="Center" />
+            </Grid>
+            <ui:TextBlock Appearance="Secondary" Text="{l:T Journal.Subtitle}" Margin="0,4,0,12" TextWrapping="Wrap" />
+            <ui:TextBlock Appearance="Tertiary" Text="{l:T Journal.Empty}" Visibility="{Binding NoSessions, Converter={StaticResource Vis}}" />
+            <ItemsControl ItemsSource="{Binding Sessions}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type f:SessionRow}">
+                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="4" Padding="14,10" Margin="0,0,0,4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="1.3*" />
+                                </Grid.ColumnDefinitions>
+                                <Ellipse Width="10" Height="10" Fill="{Binding Dot}" VerticalAlignment="Top" Margin="0,5,12,0" />
+                                <ui:TextBlock Grid.Column="1" Text="{Binding When}" Appearance="Secondary" />
+                                <StackPanel Grid.Column="2" Margin="0,0,12,0">
+                                    <ui:TextBlock Text="{Binding Game}" FontTypography="BodyStrong" TextTrimming="CharacterEllipsis" />
+                                    <ui:TextBlock Text="{Binding Models}" Appearance="Secondary" FontTypography="Caption" TextWrapping="Wrap" />
+                                    <ui:TextBlock Text="{Binding Guard}" Foreground="#F0883E" FontTypography="Caption" TextWrapping="Wrap"
+                                                  Visibility="{Binding HasGuard, Converter={StaticResource Vis}}" />
+                                </StackPanel>
+                                <ui:TextBlock Grid.Column="3" Text="{Binding Duration}" />
+                                <ui:TextBlock Grid.Column="4" Text="{Binding Result}" Appearance="Secondary" TextWrapping="Wrap" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

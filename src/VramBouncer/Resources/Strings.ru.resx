@@ -7,7 +7,6 @@
   <data name="Tray.Open" xml:space="preserve"><value>Открыть</value></data>
   <data name="Tray.Exit" xml:space="preserve"><value>Выход</value></data>
   <data name="Tray.Hidden" xml:space="preserve"><value>Программа продолжает работать в области уведомлений. Чтобы выйти, щёлкните значок правой кнопкой и выберите «Выход».</value></data>
-  <data name="Page.Main" xml:space="preserve"><value>Главная</value></data>
   <data name="Page.Settings" xml:space="preserve"><value>Настройки</value></data>
   <data name="Page.About" xml:space="preserve"><value>О программе</value></data>
   <data name="Settings.Language" xml:space="preserve"><value>Язык</value></data>
@@ -43,13 +42,163 @@
   <data name="Hotkey.Placeholder" xml:space="preserve"><value>Нажмите сочетание клавиш</value></data>
   <data name="Hotkey.Busy" xml:space="preserve"><value>Занято другой программой</value></data>
   <data name="Hotkey.Failed" xml:space="preserve"><value>Не удалось зарегистрировать</value></data>
-  <data name="Sample.Hotkey" xml:space="preserve"><value>Сочетание клавиш для окна</value></data>
-  <data name="Main.Title" xml:space="preserve"><value>Задачи</value></data>
-  <data name="Main.Subtitle" xml:space="preserve"><value>Пример страницы шаблона. Замените её страницами программы.</value></data>
-  <data name="Main.Empty" xml:space="preserve"><value>Пока пусто.</value></data>
-  <data name="Demo.Build" xml:space="preserve"><value>Сборка проекта</value></data>
-  <data name="Demo.Dataset" xml:space="preserve"><value>Загрузка датасета</value></data>
-  <data name="Demo.Report" xml:space="preserve"><value>Отчёт для Alex</value></data>
-  <data name="Demo.Daily" xml:space="preserve"><value>каждый день в 18:00</value></data>
-  <data name="Demo.Backup" xml:space="preserve"><value>Ночная копия</value></data>
+  <data name="Page.Overview" xml:space="preserve"><value>Обзор</value></data>
+  <data name="Page.Games" xml:space="preserve"><value>Игры</value></data>
+  <data name="Page.Models" xml:space="preserve"><value>Модели</value></data>
+  <data name="Page.Journal" xml:space="preserve"><value>Журнал</value></data>
+  <data name="Unit.GB" xml:space="preserve"><value>ГБ</value></data>
+  <data name="Status.Idle" xml:space="preserve"><value>Игр нет · модели на месте</value></data>
+  <data name="Status.Evicting" xml:space="preserve"><value>{0} · выгоняю модели…</value></data>
+  <data name="Status.InGame" xml:space="preserve"><value>{0} · игровой режим {1}</value></data>
+  <data name="Status.Grace" xml:space="preserve"><value>{0} закрыта · модели вернутся через {1}</value></data>
+  <data name="Status.WaitVram" xml:space="preserve"><value>Игра закрыта · жду свободную VRAM</value></data>
+  <data name="Status.Restoring" xml:space="preserve"><value>Возвращаю модели…</value></data>
+  <data name="Status.PausedUntil" xml:space="preserve"><value>Пауза до {0}</value></data>
+  <data name="Status.PausedForever" xml:space="preserve"><value>Пауза до перезапуска</value></data>
+  <data name="Overview.Gpu" xml:space="preserve"><value>{0} · {1} ГБ · свободно {2} ГБ</value></data>
+  <data name="Overview.NoNvml" xml:space="preserve"><value>Нет данных NVIDIA: итог VRAM скрыт, модели возвращаются после паузы</value></data>
+  <data name="Overview.Game" xml:space="preserve"><value>Игра</value></data>
+  <data name="Overview.Other" xml:space="preserve"><value>прочее</value></data>
+  <data name="Overview.Free" xml:space="preserve"><value>свободно</value></data>
+  <data name="Overview.EvictNow" xml:space="preserve"><value>Выгнать сейчас</value></data>
+  <data name="Overview.RestoreNow" xml:space="preserve"><value>Вернуть сейчас</value></data>
+  <data name="Overview.Pause" xml:space="preserve"><value>Пауза</value></data>
+  <data name="Overview.Models" xml:space="preserve"><value>Модели</value></data>
+  <data name="Overview.NoModels" xml:space="preserve"><value>Локальные модели не загружены.</value></data>
+  <data name="Overview.NoEvents" xml:space="preserve"><value>Пока ничего не происходило</value></data>
+  <data name="Model.Loaded" xml:space="preserve"><value>загружена</value></data>
+  <data name="Model.Skip" xml:space="preserve"><value>загружена, не трогаем: {0}</value></data>
+  <data name="Model.Out" xml:space="preserve"><value>выгнана, вернётся после игры</value></data>
+  <data name="Model.OutSoon" xml:space="preserve"><value>выгнана, скоро вернётся</value></data>
+  <data name="Model.OutNoRestore" xml:space="preserve"><value>выгнана, загрузится по первому запросу</value></data>
+  <data name="Model.Returning" xml:space="preserve"><value>возвращается</value></data>
+  <data name="Model.Error" xml:space="preserve"><value>ошибка: {0}</value></data>
+  <data name="Pause.15m" xml:space="preserve"><value>15 минут</value></data>
+  <data name="Pause.1h" xml:space="preserve"><value>1 час</value></data>
+  <data name="Pause.Restart" xml:space="preserve"><value>До перезапуска</value></data>
+  <data name="Pause.Off" xml:space="preserve"><value>Снять паузу</value></data>
+  <data name="Tray.Manual" xml:space="preserve"><value>Игровой режим вручную</value></data>
+  <data name="Tray.Pause" xml:space="preserve"><value>Пауза</value></data>
+  <data name="Tray.Evict" xml:space="preserve"><value>Выгнать модели сейчас</value></data>
+  <data name="Tray.Restore" xml:space="preserve"><value>Вернуть модели сейчас</value></data>
+  <data name="Game.Manual" xml:space="preserve"><value>Ручной игровой режим</value></data>
+  <data name="Event.Evicted" xml:space="preserve"><value>выгнано</value></data>
+  <data name="Event.Recovered" xml:space="preserve"><value>После перезапуска: {0} выгнанных моделей, возвращаю</value></data>
+  <data name="Notify.NothingLoaded" xml:space="preserve"><value>ничего не было загружено</value></data>
+  <data name="Notify.EvictFailed" xml:space="preserve"><value>{0}: не удалось выгнать. {1}</value></data>
+  <data name="Notify.Restored" xml:space="preserve"><value>Модели возвращены за {0} с</value></data>
+  <data name="Notify.GuardCount" xml:space="preserve"><value>загружались во время игры {0} раз</value></data>
+  <data name="Notify.Recognized" xml:space="preserve"><value>Распознано как игра: {0}. Не игра? Нажмите, чтобы открыть «Игры».</value></data>
+  <data name="Restore.Busy" xml:space="preserve"><value>VRAM была занята ({0} ГБ): модель могла загрузиться частично</value></data>
+  <data name="Restore.NotLoaded" xml:space="preserve"><value>{0} не в памяти после загрузки</value></data>
+  <data name="Restore.Partial" xml:space="preserve"><value>{0} загрузилась в VRAM только частично</value></data>
+  <data name="Guard.Reloaded" xml:space="preserve"><value>{0} загружена во время игры → выгнана снова</value></data>
+  <data name="Guard.Watchdog" xml:space="preserve"><value>llama-server перезапускает другая программа ({0}). Больше не трогаю: настройте для него «Свои команды».</value></data>
+  <data name="Guard.LlamaStarted" xml:space="preserve"><value>llama-server на :{0} запущен во время игры; не трогаю</value></data>
+  <data name="Llama.DebugPort" xml:space="preserve"><value>Debug-сборка: порт 8080 не трогаем</value></data>
+  <data name="Llama.Elevated" xml:space="preserve"><value>запущен от администратора, остановить нельзя</value></data>
+  <data name="Llama.PortTaken" xml:space="preserve"><value>порт {0} занят другой программой</value></data>
+  <data name="Llama.Relative" xml:space="preserve"><value>относительный путь {0}: при перезапуске может не найтись; задайте свою команду</value></data>
+  <data name="Llama.Parent" xml:space="preserve"><value>запущен из {0}: похоже, его перезапускает сторож; лучше «Свои команды»</value></data>
+  <data name="Llama.HandsOff" xml:space="preserve"><value>его перезапускает другая программа: не трогаю</value></data>
+  <data name="Llama.NoCommand" xml:space="preserve"><value>его команду запуска не прочитать, вернуть не получится</value></data>
+  <data name="Llama.Gone" xml:space="preserve"><value>сервер уже не запущен</value></data>
+  <data name="Llama.NotKilled" xml:space="preserve"><value>не завершился за 10 с</value></data>
+  <data name="Llama.Exited" xml:space="preserve"><value>llama-server завершился с кодом {0}; см. logs\llama-server.log</value></data>
+  <data name="Llama.NoHealth" xml:space="preserve"><value>/health не ответил 200 за 5 минут; см. logs\llama-server.log</value></data>
+  <data name="Command.Failed" xml:space="preserve"><value>{0}: код выхода {1}. {2}</value></data>
+  <data name="Command.Timeout" xml:space="preserve"><value>{0} не завершился за {1} с</value></data>
+  <data name="Command.CheckFailed" xml:space="preserve"><value>проверка не запустилась</value></data>
+  <data name="Command.Loaded" xml:space="preserve"><value>загружена (код 0)</value></data>
+  <data name="Command.NotLoaded" xml:space="preserve"><value>не загружена</value></data>
+  <data name="Command.NoCheck" xml:space="preserve"><value>нет команды проверки</value></data>
+  <data name="Command.Name" xml:space="preserve"><value>Имя</value></data>
+  <data name="Command.Evict" xml:space="preserve"><value>Выгрузить</value></data>
+  <data name="Command.Restore" xml:space="preserve"><value>Вернуть</value></data>
+  <data name="Command.Check" xml:space="preserve"><value>Проверка</value></data>
+  <data name="Command.Evict.Placeholder" xml:space="preserve"><value>программа и аргументы, например C:\tools\model.exe stop</value></data>
+  <data name="Command.Restore.Placeholder" xml:space="preserve"><value>необязательно: вернуть модель после игры</value></data>
+  <data name="Command.Check.Placeholder" xml:space="preserve"><value>необязательно: код выхода 0 = модель загружена</value></data>
+  <data name="Command.RunCheck" xml:space="preserve"><value>Проверить</value></data>
+  <data name="Command.Remove" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Command.Add" xml:space="preserve"><value>Добавить команду</value></data>
+  <data name="Command.NewName" xml:space="preserve"><value>Мой сервер</value></data>
+  <data name="Models.Subtitle" xml:space="preserve"><value>Что выгоняется, когда запускается игра. Только адреса loopback; каждый сервер выгружается своим API.</value></data>
+  <data name="Models.Port" xml:space="preserve"><value>Порт</value></data>
+  <data name="Models.Address" xml:space="preserve"><value>Адрес</value></data>
+  <data name="Models.RestorePolicy" xml:space="preserve"><value>Возвращать</value></data>
+  <data name="Models.Captured" xml:space="preserve"><value>Захваченная команда</value></data>
+  <data name="Models.NotRunning" xml:space="preserve"><value>не запущен</value></data>
+  <data name="Models.EditCommand" xml:space="preserve"><value>Своя команда запуска (пусто — захваченная)</value></data>
+  <data name="Models.EditCommand.Placeholder" xml:space="preserve"><value>например C:\llm\start-server.bat</value></data>
+  <data name="Models.HandsOff.Reset" xml:space="preserve"><value>Снова управлять</value></data>
+  <data name="Models.Commands" xml:space="preserve"><value>Свои команды</value></data>
+  <data name="Models.Commands.Note" xml:space="preserve"><value>Для MLink, llama-swap, WSL, Docker и всего остального: команды запускаются без окна, код 0 = готово. «Проверить» выполняет только проверку.</value></data>
+  <data name="Models.Plan" xml:space="preserve"><value>Проверить выгрузку (без действий)</value></data>
+  <data name="Models.Off" xml:space="preserve"><value>выключен</value></data>
+  <data name="Models.Found" xml:space="preserve"><value>найден</value></data>
+  <data name="Models.NotFound" xml:space="preserve"><value>не найден</value></data>
+  <data name="Models.NotRunningPort" xml:space="preserve"><value>не запущен на :{0}</value></data>
+  <data name="Models.NothingLoaded" xml:space="preserve"><value>ничего не загружено</value></data>
+  <data name="Models.Loading" xml:space="preserve"><value>загружается</value></data>
+  <data name="Models.NotLoopback" xml:space="preserve"><value>разрешены только адреса loopback</value></data>
+  <data name="Policy.Always" xml:space="preserve"><value>всегда</value></data>
+  <data name="Policy.LongLived" xml:space="preserve"><value>только долгоживущие</value></data>
+  <data name="Policy.Never" xml:space="preserve"><value>никогда</value></data>
+  <data name="Plan.Unload" xml:space="preserve"><value>{0}: выгрузить {1} ({2} ГБ)</value></data>
+  <data name="Plan.Kill" xml:space="preserve"><value>{0}: остановить {1} ({2} ГБ), после игры запустить той же командой</value></data>
+  <data name="Plan.Command" xml:space="preserve"><value>{0}: выполнить «Выгрузить»</value></data>
+  <data name="Plan.Skip" xml:space="preserve"><value>{0}: {1} не трогаем: {2}</value></data>
+  <data name="Plan.NoRestore" xml:space="preserve"><value>не возвращается</value></data>
+  <data name="Plan.NotFound" xml:space="preserve"><value>{0}: не найден</value></data>
+  <data name="Plan.Nothing" xml:space="preserve"><value>Сейчас выгонять нечего</value></data>
+  <data name="Games.Subtitle" xml:space="preserve"><value>Библиотеки Steam и Epic находятся сами. Запущенная игра включает игровой режим; «Не игра» переносит её в исключения.</value></data>
+  <data name="Games.Search" xml:space="preserve"><value>Поиск</value></data>
+  <data name="Games.AddExe" xml:space="preserve"><value>Добавить exe…</value></data>
+  <data name="Games.AddFolder" xml:space="preserve"><value>Добавить папку…</value></data>
+  <data name="Games.Refresh" xml:space="preserve"><value>Перечитать библиотеки</value></data>
+  <data name="Games.Evict" xml:space="preserve"><value>Выгонять модели</value></data>
+  <data name="Games.NotAGame" xml:space="preserve"><value>Не игра</value></data>
+  <data name="Games.IsAGame" xml:space="preserve"><value>Это игра</value></data>
+  <data name="Games.Excluded" xml:space="preserve"><value>Исключения</value></data>
+  <data name="Games.Excluded.Note" xml:space="preserve"><value>Программы из библиотек игр, которые не игры. Обработчики падений и установщики библиотек внутри папок игр тоже не считаются.</value></data>
+  <data name="Games.ByDefault" xml:space="preserve"><value>исключено по умолчанию</value></data>
+  <data name="Games.ByYou" xml:space="preserve"><value>исключено вами</value></data>
+  <data name="Games.ExeFilter" xml:space="preserve"><value>Программы</value></data>
+  <data name="Source.Steam" xml:space="preserve"><value>Steam</value></data>
+  <data name="Source.Epic" xml:space="preserve"><value>Epic</value></data>
+  <data name="Source.Manual" xml:space="preserve"><value>Вручную</value></data>
+  <data name="Journal.Subtitle" xml:space="preserve"><value>Строка на каждую игру: что выгнано, что поймал сторож и сколько длился возврат. Хранится 90 дней.</value></data>
+  <data name="Journal.OpenLogs" xml:space="preserve"><value>Открыть папку логов</value></data>
+  <data name="Journal.Empty" xml:space="preserve"><value>Игровых сессий пока нет.</value></data>
+  <data name="Journal.Nothing" xml:space="preserve"><value>ничего не было загружено</value></data>
+  <data name="Journal.Back" xml:space="preserve"><value>вернулись за {0} с</value></data>
+  <data name="Journal.BackWarn" xml:space="preserve"><value>вернулись за {0} с · {1}</value></data>
+  <data name="Journal.Error" xml:space="preserve"><value>ошибка: {0}</value></data>
+  <data name="Journal.Pending" xml:space="preserve"><value>модели выгнаны</value></data>
+  <data name="Settings.Bouncer" xml:space="preserve"><value>VRAM Bouncer</value></data>
+  <data name="Settings.Grace" xml:space="preserve"><value>Пауза после игры, с</value></data>
+  <data name="Settings.Grace.Note" xml:space="preserve"><value>Сколько секунд не должно быть ни одного процесса игры, прежде чем модели вернутся. Покрывает перезапуск игры и лаунчеры.</value></data>
+  <data name="Settings.Margin" xml:space="preserve"><value>Запас VRAM, ГБ</value></data>
+  <data name="Settings.Margin.Note" xml:space="preserve"><value>Возврат ждёт, пока свободно ≥ выгнанное + запас.</value></data>
+  <data name="Settings.WaitVram" xml:space="preserve"><value>Ждать свободную VRAM, мин</value></data>
+  <data name="Settings.WaitVram.Note" xml:space="preserve"><value>Потом модели возвращаются всё равно, с предупреждением.</value></data>
+  <data name="Settings.Guard" xml:space="preserve"><value>Сторож, раз в N с</value></data>
+  <data name="Settings.Guard.Note" xml:space="preserve"><value>Во время игры: загруженную снова модель выгоняет снова и пишет в журнал.</value></data>
+  <data name="Settings.Notify" xml:space="preserve"><value>Уведомления</value></data>
+  <data name="Settings.Notify.Evict" xml:space="preserve"><value>выгрузка</value></data>
+  <data name="Settings.Notify.Restore" xml:space="preserve"><value>возврат</value></data>
+  <data name="Settings.Notify.Errors" xml:space="preserve"><value>ошибки</value></data>
+  <data name="Settings.Notify.Summary" xml:space="preserve"><value>сводка после игры</value></data>
+  <data name="Settings.KillAnyway" xml:space="preserve"><value>Убивать llama-server, даже если не смогу вернуть</value></data>
+  <data name="Settings.KillAnyway.Note" xml:space="preserve"><value>По умолчанию выключено: без прочитанной команды запуска сервер не трогается.</value></data>
+  <data name="Exit.Message" xml:space="preserve"><value>Модели выгружены.
+
+Да — вернуть их сейчас и выйти.
+Нет — выйти, они вернутся при следующем запуске.
+Отмена — не выходить.</value></data>
+  <data name="Demo.Emulator" xml:space="preserve"><value>Мой эмулятор</value></data>
+  <data name="Demo.Toast" xml:space="preserve"><value>Dota 2 → выгнано {0} ГБ: Qwen3.8-27B, qwen3:1.7b, ComfyUI</value></data>
+  <data name="Unit.Min" xml:space="preserve"><value>{0} мин</value></data>
+  <data name="Unit.HourMin" xml:space="preserve"><value>{0} ч {1:00} мин</value></data>
 </root>

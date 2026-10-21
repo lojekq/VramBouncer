@@ -1,0 +1,63 @@
+<Page x:Class="VramBouncer.Features.OverviewPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:l="clr-namespace:VramBouncer.Shell"
+      xmlns:f="clr-namespace:VramBouncer.Features">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="Vis" />
+    </Page.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,12,24,24" MaxWidth="900">
+            <ui:TextBlock x:Name="HeaderText" FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{Binding Header, Mode=OneWay}" TextWrapping="Wrap" />
+            <ui:TextBlock Appearance="Secondary" Text="{Binding GpuCaption, Mode=OneWay}" Margin="0,4,0,10" />
+
+            <Border CornerRadius="6" Height="30" BorderThickness="1" Padding="1"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    Visibility="{Binding HasGpu, Converter={StaticResource Vis}}">
+                <Grid x:Name="BarGrid" ClipToBounds="True" />
+            </Border>
+            <WrapPanel x:Name="Legend" Margin="0,8,0,16" />
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <ui:Button x:Name="EvictButton" Appearance="Primary" Icon="{ui:SymbolIcon ArrowExportLtr24}" Content="{l:T Overview.EvictNow}"
+                           IsEnabled="{Binding CanEvict, Mode=OneWay}" Margin="0,0,8,0" />
+                <ui:Button x:Name="RestoreButton" Icon="{ui:SymbolIcon ArrowImport24}" Content="{l:T Overview.RestoreNow}"
+                           IsEnabled="{Binding CanRestore, Mode=OneWay}" Margin="0,0,8,0" />
+                <ui:DropDownButton x:Name="PauseButton" Icon="{ui:SymbolIcon Pause24}" Content="{l:T Overview.Pause}" />
+            </StackPanel>
+
+            <ui:TextBlock FontTypography="Subtitle" Text="{l:T Overview.Models}" Margin="0,0,0,8" />
+            <ui:TextBlock Appearance="Tertiary" Text="{l:T Overview.NoModels}" Margin="0,0,0,8"
+                          Visibility="{Binding NoModels, Converter={StaticResource Vis}}" />
+            <ItemsControl ItemsSource="{Binding Models, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type f:ModelRow}">
+                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="4" Padding="14,10" Margin="0,0,0,4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="2*" />
+                                </Grid.ColumnDefinitions>
+                                <Ellipse Width="10" Height="10" Fill="{Binding Dot}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <ui:TextBlock Grid.Column="1" Text="{Binding Backend}" Appearance="Secondary" VerticalAlignment="Center" />
+                                <ui:TextBlock Grid.Column="2" Text="{Binding Name}" FontTypography="BodyStrong" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                <ui:TextBlock Grid.Column="3" Text="{Binding Vram}" VerticalAlignment="Center" />
+                                <ui:TextBlock Grid.Column="4" Text="{Binding StatusText}" Appearance="Secondary" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                <ui:SymbolIcon Symbol="History24" Margin="0,0,8,0" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                <ui:TextBlock Appearance="Tertiary" Text="{Binding LastEvent, Mode=OneWay}" TextWrapping="Wrap" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
