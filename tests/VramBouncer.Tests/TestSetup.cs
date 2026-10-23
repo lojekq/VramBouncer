@@ -1,3 +1,4 @@
+using System.IO;
 using VramBouncer.Shell;
 
 namespace VramBouncer.Tests;
@@ -5,7 +6,14 @@ namespace VramBouncer.Tests;
 [TestClass]
 public static class TestSetup
 {
-    /// <summary>Tests of corrupt files log warnings; they must not create %APPDATA%\VramBouncer\logs on the machine.</summary>
+    /// <summary>
+    /// Tests run as a dev instance in any configuration (CI runs -c Release): data in TEMP, own mutex, never the installed copy's folders.
+    /// Set before anything touches AppInfo. Tests of corrupt files log warnings; logs stay off.
+    /// </summary>
     [AssemblyInitialize]
-    public static void Init(TestContext _) => Log.Off = true;
+    public static void Init(TestContext _)
+    {
+        Environment.SetEnvironmentVariable(AppInfo.Name.ToUpperInvariant() + "_DATA_DIR", Path.Combine(Path.GetTempPath(), AppInfo.Name + ".Tests"));
+        Log.Off = true;
+    }
 }

@@ -154,9 +154,9 @@ public sealed class Vm : INotifyPropertyChanged
 
     public string Tooltip => View.Phase switch
     {
-        Phase.Paused => $"{AppInfo.DisplayName} — {Header}",
-        _ when View.Evicted.Count > 0 => $"{AppInfo.DisplayName} — {View.Game}: {Loc.T("Event.Evicted")} {Engine.Gb(View.Evicted.Sum(e => e.VramBytes))} {Loc.T("Unit.GB")}",
-        _ => $"{AppInfo.DisplayName} — {Header}",
+        Phase.Paused => $"{AppInfo.Title} — {Header}",
+        _ when View.Evicted.Count > 0 => $"{AppInfo.Title} — {View.Game}: {Loc.T("Event.Evicted")} {Engine.Gb(View.Evicted.Sum(e => e.VramBytes))} {Loc.T("Unit.GB")}",
+        _ => $"{AppInfo.Title} — {Header}",
     };
 
     static List<ModelRow> BuildModels(View v)
