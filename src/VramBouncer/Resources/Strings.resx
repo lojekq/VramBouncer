@@ -239,4 +239,20 @@ Cancel: keep running.</value></data>
   <data name="Models.Token" xml:space="preserve"><value>API token (only if LM Studio requires authentication)</value></data>
   <data name="Models.TokenSaved" xml:space="preserve"><value>saved, encrypted for this Windows user</value></data>
   <data name="Models.Router" xml:space="preserve"><value>router mode</value></data>
+  <data name="Llama.MLinkCommand" xml:space="preserve"><value>MLink's model: unloaded by MLink's own command (off --hold)</value></data>
+  <data name="Llama.MLinkOffer" xml:space="preserve"><value>MLink's model: stopping it is useless, MLink starts it again within 5 minutes. Press "Use MLink's commands"</value></data>
+  <data name="Method.Kill" xml:space="preserve"><value>How it's unloaded: the process is stopped and started again with the same command after the game</value></data>
+  <data name="Method.Router" xml:space="preserve"><value>How it's unloaded: router mode, /models/unload and /models/load by name; the server keeps running</value></data>
+  <data name="Method.MLink" xml:space="preserve"><value>How it's unloaded: MLink's command "off --hold", back with "restore" (My commands → MLink)</value></data>
+  <data name="Method.None" xml:space="preserve"><value>How it's unloaded: not unloaded (see the note above)</value></data>
+  <data name="Method.Ollama" xml:space="preserve"><value>How it's unloaded: keep_alive 0 through its API; back with the same context size</value></data>
+  <data name="Method.Comfy" xml:space="preserve"><value>How it's unloaded: POST /free; ComfyUI loads its models again on the next request</value></data>
+  <data name="Method.LmStudio" xml:space="preserve"><value>How it's unloaded: REST API, unload by instance, load back with the same settings; lms unload --all if the server is off</value></data>
+  <data name="Guard.Restarted" xml:space="preserve"><value>llama-server on :{0} started again during the game, {1} min after it was unloaded (started by {2}). Another program brings it back on its own; it is left alone now. For MLink use "Use MLink's commands" on the Models page.</value></data>
+  <data name="Guard.MLinkBack" xml:space="preserve"><value>MLink's model is running again during the game: a model was chosen in MLink's tray, or MLink was started again (that ends the hold). Left alone: it's your choice; Pause in VRAM Bouncer if you want the model during a game.</value></data>
+  <data name="Guard.Unknown" xml:space="preserve"><value>unknown</value></data>
+  <data name="MLink.Title" xml:space="preserve"><value>MLink found</value></data>
+  <data name="MLink.Message" xml:space="preserve"><value>Its llama-server on :8080 is started again by MLink's watchdog, so stopping it does not free VRAM for long. MLink's own commands keep the model off for the whole game and bring the same model back.</value></data>
+  <data name="MLink.Button" xml:space="preserve"><value>Use MLink's commands for :8080</value></data>
+  <data name="MLink.Notify" xml:space="preserve"><value>MLink found: its model should be unloaded by MLink's commands. Click to open Models and turn them on.</value></data>
 </root>

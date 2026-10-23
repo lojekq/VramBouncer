@@ -20,6 +20,7 @@ public sealed class Engine
     readonly CancellationTokenSource stop = new();
     readonly GameWatcher watcher = new();
     readonly HintWatch hints = new();
+    long? freeBefore; // free VRAM right before the eviction, models still loaded
 
     BState state = new();
     List<Snap> evicted = [];
@@ -77,6 +78,20 @@ public sealed class Engine
     public void Forget(string exe) => Post(ct => { hints.Forget(exe); catalogAt = default; return Step(ct); });
     public bool HasEvicted => evicted.Count > 0;
 
+    /// <summary>MLink is installed and its model is not handled by its own commands yet.</summary>
+    public static bool MLinkOffer => MLink.Detect() is not null && !Settings.Current.Backends.Commands.Any(MLink.Is);
+
+    /// <summary>One click: MLink's off --hold / restore for its model, and the llama-server backend leaves :8080 alone.</summary>
+    public static void UseMLink()
+    {
+        if (MLink.Detect() is not { } py) return;
+        var b = Settings.Current.Backends;
+        if (!b.Commands.Any(MLink.Is)) b.Commands.Add(MLink.Command(py));
+        if (b.Llama.Port == MLink.Port) b.Llama.On = false;
+        Settings.Save();
+        I?.RefreshCatalog();
+    }
+
     /// <summary>"Check eviction": what would be done now, nothing is run.</summary>
     public Task<List<string>> Plan() => Run(async ct =>
     {
@@ -120,6 +135,12 @@ public sealed class Engine
     async Task Init(CancellationToken ct)
     {
         Catalog();
+        if (MLinkOffer && !Settings.Current.MLinkOffered)
+        {
+            Settings.Current.MLinkOffered = true;
+            Settings.Save();
+            Notify(true, Loc.T("MLink.Notify"), "models");
+        }
         var saved = Store.Load();
         if (saved is { Evicted.Count: > 0 })
         {
@@ -159,9 +180,20 @@ public sealed class Engine
     Input Input(Cmd cmd, DateTime? until = null)
     {
         var gpu = VramMonitor.Read();
-        var needed = evicted.Sum(e => e.VramBytes) + (long)(Settings.Current.Timings.MarginGb * GB);
+        var needed = state.Phase == Phase.Cooldown // only there it matters, and a port check per item is cheap
+            ? Bouncer.Needed(evicted.Select(e => (e.VramBytes, Back(e))), (long)(Settings.Current.Timings.MarginGb * GB), freeBefore)
+            : 0;
         return new(DateTime.UtcNow, GameName(), gpu?.Free, needed, cmd, until);
     }
+
+    /// <summary>Already running again (a watchdog, MLink's tray): its VRAM is taken, waiting for it would last the whole 10 minutes.</summary>
+    static bool Back(Snap s) => s.Backend switch
+    {
+        "llama-server" when s.Instance is null => TcpPorts.ListenerPid(s.Port ?? 0) is not null,
+        "command" when Settings.Current.Backends.Commands.FirstOrDefault(c => c.Name == s.Model) is { } c && MLink.Is(c)
+            => TcpPorts.ListenerPid(MLink.Port) is not null,
+        _ => false,
+    };
 
     string? GameName() => running.Count > 0 ? running[0].Game.Name : manual ? Loc.T("Game.Manual") : null;
 
@@ -197,6 +229,7 @@ public sealed class Engine
     async Task Evict(CancellationToken ct)
     {
         PublishNow(); // "Evicting…" on screen while it runs
+        freeBefore = VramMonitor.Read()?.Free;
         var skipped = new List<Snap>();
         var plan = new List<(Backend B, Snap S)>();
         foreach (var b in Backends()) // llama-server first: the biggest one goes within the first seconds
@@ -275,10 +308,12 @@ public sealed class Engine
             var guardCount = session.Guard.Count;
             var text = string.Format(Loc.T("Notify.Summary"), session.Game, SessionRow.Minutes(session.End.Value - session.Start),
                 Gb(session.Evicted.Sum(m => m.Bytes)), secs) + (guardCount > 0 ? " · " + string.Format(Loc.T("Notify.GuardCount"), guardCount) : "");
+            var back = session.Back.LastOrDefault(); // "a model came back mid-game" outweighs the count
+            var summary = back is null ? text : text + "\n" + back;
             Event(text);
             if (errors.Count > 0) Notify(Settings.Current.Notify.Errors, string.Join("\n", errors), "journal");
             else if (warnings.Count > 0) Notify(Settings.Current.Notify.Errors, string.Join("\n", warnings), "journal");
-            else Notify(Settings.Current.Notify.Restore || guardCount > 0 && Settings.Current.Notify.Summary, text, "journal");
+            else Notify(Settings.Current.Notify.Restore || guardCount > 0 && Settings.Current.Notify.Summary, summary, "journal");
             session = null;
         }
         Log.Info($"restore done in {secs} s, {errors.Count} error(s), {warnings.Count} warning(s)");
@@ -300,7 +335,8 @@ public sealed class Engine
             }
             catch (Exception e) when (!ct.IsCancellationRequested) { Log.Warn($"{b.Kind}: guard failed ({e.GetType().Name})"); }
         }
-        foreach (var w in guard.Warnings) Notify(Settings.Current.Notify.Errors, w, "models");
+        foreach (var w in guard.Warnings) Notify(Settings.Current.Notify.Errors, w, "models"); // muted in full screen: the summary repeats it
+        session?.Back.AddRange(guard.Warnings);
         guard.Warnings.Clear();
     }
 

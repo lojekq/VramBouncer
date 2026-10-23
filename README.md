@@ -74,7 +74,7 @@ The app offers to install itself: **Install** copies it to `%LOCALAPPDATA%\Progr
 The app lives in the tray: green icon — normal, orange — game mode, gray — paused.
 Open **Models** and press **Check eviction (dry run)**: it lists what would be unloaded, without doing it.
 
-If another program restarts your llama-server (a watchdog, a launcher like MLink), turn its llama-server backend off and add its own stop and start commands under **My commands**.
+If another program restarts your llama-server (a watchdog, a launcher like MLink), turn its llama-server backend off and add its own stop and start commands under **My commands**. For MLink the app offers this itself.
 
 ## Settings
 
@@ -121,8 +121,9 @@ Nothing is injected, no memory is read, nothing is drawn over the game.
 
 <details><summary>Something restarts llama-server right after it is stopped</summary>
 
-That is a watchdog (a launcher, a script, a scheduled task). VRAM Bouncer notices a server that comes back within 60 s, leaves it alone and tells you.
-Turn the llama-server backend off and put the launcher's own commands under **My commands**, for example `pythonw.exe -m mlink_v2.llama off --hold` and `… restore` for MLink.
+That is a watchdog (a launcher, a script, a scheduled task). VRAM Bouncer notices a server that comes back during the game, leaves it alone and tells you why (the summary after the game repeats it: Windows mutes notifications in full screen).
+Turn the llama-server backend off and put the launcher's own commands under **My commands**.
+MLink is found by itself: its llama-server on :8080 is never stopped, and one button, **Use MLink's commands for :8080**, sets up `off --hold` / `restore`, which keep the model off for the whole game.
 </details>
 
 <details><summary>My game is not detected / a tool keeps game mode on</summary>

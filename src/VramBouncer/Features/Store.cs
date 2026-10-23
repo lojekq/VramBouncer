@@ -18,6 +18,7 @@ public sealed record Session
     public double? RestoreSec { get; set; }
     public string Result { get; set; } = "ok";     // ok | warning | error | pending
     public string? Note { get; set; }
+    [JsonIgnore] public List<string> Back { get; } = []; // guard warnings: a model came back mid-game (for the summary)
 }
 
 public sealed record SessionModel(string Backend, string Name, long Bytes);

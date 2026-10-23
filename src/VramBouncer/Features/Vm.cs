@@ -149,6 +149,7 @@ public sealed class Vm : INotifyPropertyChanged
     public bool CanEvict => View.Phase is Phase.Idle;
     public bool CanRestore => View.Evicted.Count > 0 && View.Phase is Phase.InGame or Phase.Cooldown;
     public bool IsPaused => View.Phase == Phase.Paused;
+    public bool MLinkOffer => !Args.Current.Demo && Engine.MLinkOffer;
     public bool Manual => View.Manual;
 
     public string Tooltip => View.Phase switch
@@ -165,7 +166,9 @@ public sealed class Vm : INotifyPropertyChanged
         var keys = v.Evicted.Select(e => (e.Backend, e.Label)).ToHashSet();
         foreach (var p in v.Probes.Values)
             foreach (var s in p.Loaded.Where(s => !keys.Contains((s.Backend, s.Label))))
-                rows.Add(Row(s, s.Skip is { } why ? string.Format(Loc.T("Model.Skip"), why) : Loc.T("Model.Loaded"), s.Skip is null ? Status.Loaded : Status.Skip));
+                rows.Add(s.Skip is { } why && why == Loc.T("Llama.MLinkCommand") // handled, just not by this backend
+                    ? Row(s, $"{Loc.T("Model.Loaded")} · {why}", Status.Loaded)
+                    : Row(s, s.Skip is { } w ? string.Format(Loc.T("Model.Skip"), w) : Loc.T("Model.Loaded"), s.Skip is null ? Status.Loaded : Status.Skip));
         foreach (var s in v.Evicted)
             rows.Add(Row(s,
                 restoring ? Loc.T("Model.Returning")

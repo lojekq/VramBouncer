@@ -9,6 +9,7 @@ namespace VramBouncer.Shell
         public BackendsConfig Backends { get; set; } = new();
         public TimingsConfig Timings { get; set; } = new();
         public NotifyConfig Notify { get; set; } = new();
+        public bool MLinkOffered { get; set; }          // "Use MLink's commands" was offered once
         /// <summary>"Kill llama-server even if I can't bring it back": off, see spec §8.</summary>
         public bool KillWithoutRestore { get; set; }
     }

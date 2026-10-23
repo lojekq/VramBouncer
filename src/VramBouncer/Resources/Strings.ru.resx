@@ -239,4 +239,20 @@
   <data name="Models.Token" xml:space="preserve"><value>API-токен (только если LM Studio требует авторизацию)</value></data>
   <data name="Models.TokenSaved" xml:space="preserve"><value>сохранён, зашифрован для этого пользователя Windows</value></data>
   <data name="Models.Router" xml:space="preserve"><value>режим router</value></data>
+  <data name="Llama.MLinkCommand" xml:space="preserve"><value>модель MLink: выгружается командой самого MLink (off --hold)</value></data>
+  <data name="Llama.MLinkOffer" xml:space="preserve"><value>модель MLink: останавливать её бесполезно, MLink поднимет её снова за 5 минут. Нажмите «Использовать команды MLink»</value></data>
+  <data name="Method.Kill" xml:space="preserve"><value>Как выгружается: процесс останавливается, после игры запускается той же командой</value></data>
+  <data name="Method.Router" xml:space="preserve"><value>Как выгружается: режим router, /models/unload и /models/load по имени; сервер продолжает работать</value></data>
+  <data name="Method.MLink" xml:space="preserve"><value>Как выгружается: командой MLink «off --hold», возврат — «restore» («Свои команды» → MLink)</value></data>
+  <data name="Method.None" xml:space="preserve"><value>Как выгружается: не выгружается (см. причину выше)</value></data>
+  <data name="Method.Ollama" xml:space="preserve"><value>Как выгружается: keep_alive 0 через API; возврат с тем же размером контекста</value></data>
+  <data name="Method.Comfy" xml:space="preserve"><value>Как выгружается: POST /free; ComfyUI сам загрузит модели при следующем запросе</value></data>
+  <data name="Method.LmStudio" xml:space="preserve"><value>Как выгружается: REST API, выгрузка по экземпляру, возврат с теми же настройками; lms unload --all, если сервер выключен</value></data>
+  <data name="Guard.Restarted" xml:space="preserve"><value>llama-server на :{0} снова запущен во время игры, через {1} мин после выгрузки (запустил {2}). Его поднимает другая программа сама; больше не трогаю. Для MLink нажмите «Использовать команды MLink» на странице «Модели».</value></data>
+  <data name="Guard.MLinkBack" xml:space="preserve"><value>Модель MLink снова работает во время игры: в трее MLink выбрали модель или MLink запустили заново (это снимает удержание). Не трогаю: это ваш выбор; если модель нужна в игре — «Пауза» в VRAM Bouncer.</value></data>
+  <data name="Guard.Unknown" xml:space="preserve"><value>неизвестно</value></data>
+  <data name="MLink.Title" xml:space="preserve"><value>Найден MLink</value></data>
+  <data name="MLink.Message" xml:space="preserve"><value>Его llama-server на :8080 снова поднимает сторож MLink, поэтому остановка процесса освобождает VRAM ненадолго. Собственные команды MLink держат модель выключенной всю игру и возвращают ту же модель.</value></data>
+  <data name="MLink.Button" xml:space="preserve"><value>Использовать команды MLink для :8080</value></data>
+  <data name="MLink.Notify" xml:space="preserve"><value>Найден MLink: его модель нужно выгружать командами MLink. Нажмите, чтобы открыть «Модели» и включить их.</value></data>
 </root>

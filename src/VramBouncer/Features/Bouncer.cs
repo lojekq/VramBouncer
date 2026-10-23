@@ -84,6 +84,13 @@ public static class Bouncer
     }
 
     /// <summary>
+    /// Free VRAM the restore waits for: what is still out (a server someone already started again needs no room)
+    /// plus the margin, but no more margin than was free before the game, or a full card would wait the whole 10 minutes.
+    /// </summary>
+    public static long Needed(IEnumerable<(long Bytes, bool Back)> evicted, long margin, long? freeBefore) =>
+        evicted.Where(e => !e.Back).Sum(e => e.Bytes) + Math.Min(margin, Math.Max(0, freeBefore ?? margin));
+
+    /// <summary>
     /// Start-up check of state.json: what is already loaded again (by MLink autostart, by hand) is crossed out;
     /// the rest comes back after the grace if no game runs, otherwise we are in a game.
     /// </summary>

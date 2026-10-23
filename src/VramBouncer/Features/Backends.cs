@@ -35,6 +35,9 @@ public sealed record Snap
 /// <summary>Found = the server answers. Detail is shown in the UI only (a command line): never logged.</summary>
 public sealed record Probe(bool Found, string? Version, List<Snap> Loaded, List<string> Warnings, string? Detail = null)
 {
+    /// <summary>How this server is unloaded, for the Models page (llama-server: kill, router or MLink).</summary>
+    public string? Method { get; init; }
+
     public static Probe None(params string[] warnings) => new(false, null, [], [.. warnings]);
 }
 
@@ -322,11 +325,20 @@ public sealed class LlamaBackend(LlamaConfig cfg) : Backend
         var cmd = ProcessInfo.CommandLine(pid);
         var raw = cmd is null ? null : CmdLine.SplitExe(cmd).RawArgs;
         var args = raw is null ? [] : CmdLine.Args(raw);
+        if (MLink.Owns(cmd)) // MLink's watchdog starts a killed server again within 5 min: only MLink's own commands work
+        {
+            var viaCommand = Settings.Current.Backends.Commands.Any(c => c.On && MLink.Is(c));
+            var why = Loc.T(viaCommand ? "Llama.MLinkCommand" : "Llama.MLinkOffer");
+            var vram = VramMonitor.PerProcess([pid], VramMonitor.Read()?.Total ?? 0).GetValueOrDefault(pid);
+            return new(true, await Http.Healthy(port, ct) ? "ok" : "loading",
+                [new() { Backend = Kind, Model = "MLink", Port = port, Pid = pid, VramBytes = vram, Skip = why }], viaCommand ? [] : [why], cmd)
+            { Method = Loc.T(viaCommand ? "Method.MLink" : "Method.None") };
+        }
         if (await Router(port, ct) is { } models) // router mode (v1.0): unload and load by name, no kill
             return new(true, "router", [.. Loaded(models).Select(id => new Snap
             {
                 Backend = Kind, Model = id, Port = port, Pid = pid, Instance = "router", Restore = cfg.Restore != RestorePolicy.Never,
-            })], [], cmd);
+            })], [], cmd) { Method = Loc.T("Method.Router") };
         foreach (var rel in LlamaArgs.RelativePaths(args)) warnings.Add(string.Format(Loc.T("Llama.Relative"), rel));
         if (ProcessInfo.Tree().Parent(pid)?.Exe is { } parent && Watchdogs.Contains(parent, StringComparer.OrdinalIgnoreCase))
             warnings.Add(string.Format(Loc.T("Llama.Parent"), parent));
@@ -346,7 +358,7 @@ public sealed class LlamaBackend(LlamaConfig cfg) : Backend
             VramBytes = VramMonitor.PerProcess([pid], VramMonitor.Read()?.Total ?? 0).GetValueOrDefault(pid),
             Restore = hasCommand && cfg.Restore != RestorePolicy.Never, Skip = skip,
         };
-        return new(true, health ? "ok" : "loading", [snap], warnings, cmd);
+        return new(true, health ? "ok" : "loading", [snap], warnings, cmd) { Method = Loc.T(skip is null ? "Method.Kill" : "Method.None") };
     }
 
     public override async Task<Snap> EvictAsync(Snap s, CancellationToken ct)
@@ -416,6 +428,7 @@ public sealed class LlamaBackend(LlamaConfig cfg) : Backend
         var events = new List<string>();
         var port = cfg.Port;
         if (Forbidden(port) || TcpPorts.ListenerPid(port) is not { } pid) return events;
+        if (MLink.Owns(ProcessInfo.CommandLine(pid))) return events; // the MLink command's guard tells about it
         if (await Router(port, ct) is { } models) // router: a client request loads a model again (autoload)
         {
             foreach (var id in Loaded(models))
@@ -429,22 +442,24 @@ public sealed class LlamaBackend(LlamaConfig cfg) : Backend
         }
         if (!g.Reported.Add(pid)) return events;
         var killed = g.Evicted.FirstOrDefault(e => e.Backend == Kind && e.Port == port)?.KilledAt;
-        if (killed is { } k && ProcessInfo.StartTime(pid) is { } started && KillLoop.IsWatchdog(k, started))
+        var started = ProcessInfo.StartTime(pid);
+        var parent = ProcessInfo.Tree().Ancestors(pid).FirstOrDefault()?.Exe ?? Loc.T("Guard.Unknown");
+        string text;
+        if (killed is { } k && started is { } s0 && KillLoop.IsWatchdog(k, s0))
         {
             cfg.HandsOff = true;
             Settings.Save();
-            var parent = ProcessInfo.Tree().Ancestors(pid).FirstOrDefault()?.Exe ?? "?";
-            var text = string.Format(Loc.T("Guard.Watchdog"), parent);
-            events.Add(text);
-            g.Warnings.Add(text);
+            text = string.Format(Loc.T("Guard.Watchdog"), parent);
             Log.Warn($"llama-server on :{port} came back within 60 s: another program restarts it");
         }
-        else
+        else if (killed is { } k1 && started is { } s1 && s1 > k1) // later than a watchdog would: still not us, and not the user's click
         {
-            var text = string.Format(Loc.T("Guard.LlamaStarted"), port);
-            events.Add(text);
-            g.Warnings.Add(text);
+            text = string.Format(Loc.T("Guard.Restarted"), port, Math.Max(1, (int)(s1 - k1).TotalMinutes), parent);
+            Log.Warn($"llama-server on :{port} started again {(int)(s1 - k1).TotalSeconds} s after the kill");
         }
+        else text = string.Format(Loc.T("Guard.LlamaStarted"), port);
+        events.Add(text);
+        g.Warnings.Add(text);
         return events;
     }
 
@@ -572,6 +587,14 @@ public sealed class CommandBackend(UserCommand cmd) : Backend
 
     public override async Task<List<string>> GuardAsync(Guard g, CancellationToken ct)
     {
+        if (MLink.Is(cmd) && cmd.Check.Length == 0) // held by off --hold: only the user's choice in MLink's tray brings it back
+        {
+            if (TcpPorts.ListenerPid(MLink.Port) is not { } pid || !g.Reported.Add(pid) || !await Http.Healthy(MLink.Port, ct)) return [];
+            var text = Loc.T("Guard.MLinkBack");
+            g.Warnings.Add(text);
+            Log.Warn("MLink's model is running again during a game");
+            return [text];
+        }
         if (cmd.Check.Length == 0 || await IsLoadedAsync(Snap(), ct) != true) return [];
         await EvictAsync(Snap(), ct);
         return [string.Format(Loc.T("Guard.Reloaded"), cmd.Name)];

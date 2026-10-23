@@ -22,6 +22,8 @@ public partial class OverviewPage
         Unloaded += (_, _) => { Vm.I.Changed -= Draw; tick.Stop(); };
     }
 
+    void UseMLink(object sender, RoutedEventArgs e) => Engine.UseMLink();
+
     /// <summary>The VRAM bar: one star column per segment, legend chips below.</summary>
     void Draw()
     {

@@ -24,6 +24,10 @@
         <StackPanel Margin="24,12,24,24" MaxWidth="900">
             <ui:TextBlock FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{l:T Page.Models}" />
             <ui:TextBlock Appearance="Secondary" Text="{l:T Models.Subtitle}" Margin="0,4,0,12" TextWrapping="Wrap" />
+            <StackPanel x:Name="MLinkBar" Margin="0,0,0,12">
+                <ui:InfoBar Severity="Warning" IsClosable="False" IsOpen="True" Title="{l:T MLink.Title}" Message="{l:T MLink.Message}" />
+                <ui:Button Content="{l:T MLink.Button}" Appearance="Primary" Click="UseMLink" Margin="0,6,0,0" />
+            </StackPanel>
 
             <!-- llama-server -->
             <Border Style="{StaticResource Card}" DataContext="{x:Static f:ModelsPage.Llama}">
@@ -33,6 +37,7 @@
                         <StackPanel>
                             <ui:TextBlock Text="llama-server" FontTypography="BodyStrong" />
                             <ui:TextBlock x:Name="LlamaStatus" Appearance="Secondary" FontTypography="Caption" TextWrapping="Wrap" />
+                            <ui:TextBlock x:Name="LlamaMethod" Appearance="Tertiary" FontTypography="Caption" TextWrapping="Wrap" />
                         </StackPanel>
                         <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding On}" />
                     </Grid>
@@ -71,6 +76,7 @@
                         <StackPanel>
                             <ui:TextBlock Text="LM Studio" FontTypography="BodyStrong" />
                             <ui:TextBlock x:Name="LmStatus" Appearance="Secondary" FontTypography="Caption" TextWrapping="Wrap" />
+                            <ui:TextBlock Text="{l:T Method.LmStudio}" Appearance="Tertiary" FontTypography="Caption" TextWrapping="Wrap" />
                         </StackPanel>
                         <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding On}" />
                     </Grid>
@@ -99,6 +105,7 @@
                         <StackPanel>
                             <ui:TextBlock Text="Ollama" FontTypography="BodyStrong" />
                             <ui:TextBlock x:Name="OllamaStatus" Appearance="Secondary" FontTypography="Caption" TextWrapping="Wrap" />
+                            <ui:TextBlock Text="{l:T Method.Ollama}" Appearance="Tertiary" FontTypography="Caption" TextWrapping="Wrap" />
                         </StackPanel>
                         <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding On}" />
                     </Grid>
@@ -123,6 +130,7 @@
                         <StackPanel>
                             <ui:TextBlock Text="ComfyUI" FontTypography="BodyStrong" />
                             <ui:TextBlock x:Name="ComfyStatus" Appearance="Secondary" FontTypography="Caption" TextWrapping="Wrap" />
+                            <ui:TextBlock Text="{l:T Method.Comfy}" Appearance="Tertiary" FontTypography="Caption" TextWrapping="Wrap" />
                         </StackPanel>
                         <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding On}" />
                     </Grid>

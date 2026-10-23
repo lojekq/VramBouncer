@@ -83,6 +83,8 @@ public partial class ModelsPage
         ComfyStatus.Text = Status("comfyui", Comfy.On, null);
         LmStatus.Text = Status("lmstudio", LmStudio.On, null);
         var lp = p.GetValueOrDefault("llama-server");
+        LlamaMethod.Text = lp?.Method ?? Loc.T("Method.Kill");
+        MLinkBar.Visibility = Vm.I.MLinkOffer ? Visibility.Visible : Visibility.Collapsed;
         LlamaCaptured.Text = lp?.Detail ?? "";
         LlamaWarnings.ItemsSource = lp?.Warnings ?? (Llama.HandsOff ? [Loc.T("Llama.HandsOff")] : []);
         HandsOffButton.Visibility = Llama.HandsOff ? Visibility.Visible : Visibility.Collapsed;
@@ -101,6 +103,14 @@ public partial class ModelsPage
         if (kind == "llama-server" && p.Version == "router") parts.Insert(1, Loc.T("Models.Router"));
         if (kind != "llama-server") parts.AddRange(p.Warnings); // llama-server has its own list below
         return string.Join(" · ", parts);
+    }
+
+    void UseMLink(object sender, RoutedEventArgs e)
+    {
+        Engine.UseMLink();
+        rows.Clear();
+        foreach (var c in Settings.Current.Backends.Commands) rows.Add(new(c));
+        Draw();
     }
 
     async void RunCheck(object sender, RoutedEventArgs e)

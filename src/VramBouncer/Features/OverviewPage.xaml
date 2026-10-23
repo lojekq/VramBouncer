@@ -10,6 +10,11 @@
     </Page.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24,12,24,24" MaxWidth="900">
+            <!-- The button sits under the bar: WPF-UI's InfoBar drops its content when the message wraps -->
+            <StackPanel Visibility="{Binding MLinkOffer, Converter={StaticResource Vis}}" Margin="0,0,0,12">
+                <ui:InfoBar Severity="Warning" IsClosable="False" IsOpen="True" Title="{l:T MLink.Title}" Message="{l:T MLink.Message}" />
+                <ui:Button Content="{l:T MLink.Button}" Appearance="Primary" Click="UseMLink" Margin="0,6,0,0" />
+            </StackPanel>
             <ui:TextBlock x:Name="HeaderText" FontTypography="Title" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{Binding Header, Mode=OneWay}" TextWrapping="Wrap" />
             <ui:TextBlock Appearance="Secondary" Text="{Binding GpuCaption, Mode=OneWay}" Margin="0,4,0,10" />
 
