@@ -111,7 +111,9 @@ public static class AppSettings
         var s = Settings.Current;
         var t = s.Timings;
         var panel = new StackPanel();
-        panel.Children.Add(new TextBlock { Text = Loc.T("Settings.Bouncer"), FontTypography = FontTypography.Subtitle, Margin = new(0, 0, 0, 8) });
+        var title = new TextBlock { Text = Loc.T("Settings.Bouncer"), FontTypography = FontTypography.Subtitle, Margin = new(0, 0, 0, 8) };
+        title.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "TextFillColorPrimaryBrush"); // black in the dark theme otherwise
+        panel.Children.Add(title);
         panel.Children.Add(Number("Settings.Grace", "Settings.Grace.Note", SymbolRegular.Timer24, t.GraceSec, v => t.GraceSec = (int)Math.Clamp(v, 5, 3600)));
         panel.Children.Add(Number("Settings.Margin", "Settings.Margin.Note", SymbolRegular.DataHistogram24, t.MarginGb, v => t.MarginGb = Math.Clamp(v, 0, 8)));
         panel.Children.Add(Number("Settings.WaitVram", "Settings.WaitVram.Note", SymbolRegular.HourglassHalf24, t.WaitVramMin, v => t.WaitVramMin = (int)Math.Clamp(v, 1, 120)));

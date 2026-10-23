@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows;
 using VramBouncer.Demo;
 using VramBouncer.Features;
@@ -29,9 +28,7 @@ public partial class App : Application
     {
         base.OnStartup(e);
         var a = Args.Current;
-        Crash.Install(this);
-        Settings.Load();
-        Loc.Apply(Settings.Current.Language);
+        Crash.Install(this); // Settings and Loc are already loaded in Program.Main
         // Before the installer: --uninstall asks it. Models still out (state.json) would never come back once the program is gone
         RemoveData = () => (Engine.I?.HasEvicted ?? Store.Load() is { Evicted.Count: > 0 }) ? Loc.T("Remove.Evicted") : null;
         if (await Installer.HandleAsync()) // install, update, switch to the installed copy or uninstall: this process is done
@@ -46,12 +43,7 @@ public partial class App : Application
         }
         Log.Info($"start {AppInfo.Version}{(a.Unknown.Count > 0 ? $", {a.Unknown.Count} unknown argument(s)" : "")}");
 
-        if (a.Demo)
-        {
-            // Screenshots: numbers and dates in the language of the picture; real runs keep the Windows regional format
-            CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentUICulture;
-            DemoData.Fill();
-        }
+        if (a.Demo) DemoData.Fill();
         else if (Install.IsInstalled) Installer.InstalledStart(AutostartOnInstall); // Debug builds and exes elsewhere write nothing by themselves
 
         // App features: services, hotkeys, tray items, settings section

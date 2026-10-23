@@ -1,3 +1,4 @@
+using System.Globalization;
 using VramBouncer.Shell;
 
 namespace VramBouncer;
@@ -21,6 +22,12 @@ public static class Program
             catch (Exception e) { Log.Error($"{args[0]} failed", e); return 1; }
         }
         Args.Current = Args.Parse(args);
+        // Here, not in OnStartup: the UI culture is AsyncLocal, and a value set inside the async OnStartup
+        // is undone when it awaits, so strings built later fell back to the Windows language
+        Settings.Load();
+        Loc.Apply(Settings.Current.Language);
+        // Screenshots: numbers and dates in the language of the picture; real runs keep the Windows regional format
+        if (Args.Current.Demo) CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentUICulture;
         var app = new App();
         app.InitializeComponent();
         return app.Run();
